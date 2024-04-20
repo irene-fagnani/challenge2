@@ -18,3 +18,6 @@ clean:
 
 distclean: clean
 	$(RM) *~
+
+doc:
+	doxygen $(DOXYFILE)
