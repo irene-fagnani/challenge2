@@ -4,6 +4,7 @@ CPPFLAGS=-Wall -Wextra
 SRC_DIR = src
 INCLUDE_DIR = include
 TARGET = main
+DOXYFILE=../pacs-examples/Example/DoxyfileCommon
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,%.o,$(SRCS))
 INCLUDES:= -I$(INCLUDE_DIR)
