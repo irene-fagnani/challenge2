@@ -53,6 +53,7 @@ enum StorageOrder{
        @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
        */
        MatrixClass(std::size_t rows = 0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {}
+
         /*
         @brief non const call operator
         @param row index
@@ -60,6 +61,14 @@ enum StorageOrder{
         @param value to add in the matrix in (i,j) position
         */
        T & operator()(const std::size_t i,const std::size_t j);
+
+        /*
+        @brief const call operator
+        @param row index
+        @param column index
+        @param value to add in the matrix in (i,j) position
+        */
+       T operator()(const std::size_t i,const std::size_t j) const;
     
         /*
         @brief perform the compression, according the storage order defined at compile time

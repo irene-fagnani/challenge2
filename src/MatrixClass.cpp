@@ -15,23 +15,39 @@ void MatrixClass<T,S>::compress(){
 
 template<typename T, StorageOrder S>
 T & MatrixClass<T,S>::operator()(const std::size_t i,const std::size_t j){
-      /*
+      
         if(!in_bound(i,j)){
-             std::cerr("Index out of bounds.");
+             std::cerr<<"Index out of bounds."<<std::endl;
         }
 
         if constexpr(S==StorageOrder::row_wise){
 
-             return   data[{i,j}];
+             return   _data[{i,j}];
             
         }
         if constexpr(S==StorageOrder::column_wise){
 
-             return data[{j,i}];
+             return _data[{j,i}];
             
     }
-    return data[{i,j}];
-    */
+    
+}
+
+template<typename T, StorageOrder S>
+T MatrixClass<T,S>::operator()(const std::size_t i,const std::size_t j)const{
+
+        if constexpr(S==StorageOrder::row_wise){
+
+             return  _data.at({i,j});
+            
+        }
+        if constexpr(S==StorageOrder::column_wise){
+
+             return _data.at({j,i});
+            
+    }
+
+    
 }
 
 
