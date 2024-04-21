@@ -1,6 +1,7 @@
 #include <map>
 #include <array>
 #include <iostream>
+#include <vector>
 
 
 namespace algebra{
@@ -20,13 +21,13 @@ enum StorageOrder{
     @brief dynamic matrix class template
     */
     template<typename T, StorageOrder S>
-    class Matrix{
+    class MatrixClass{
 
        private:
 
-       std::size_t rows,cols;
+       std::size_t _rows,_cols;
 
-       std::map<std::array<std::size_t,2>,T> data;
+       std::map<std::array<std::size_t,2>,T> _data;
 
        bool compressed;
 
@@ -43,6 +44,7 @@ enum StorageOrder{
        bool in_bound(const std::size_t r,const std::size_t c) const;
 
        public:
+       friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
        
        /*
        @brief constructor for the Matrix class
@@ -50,7 +52,7 @@ enum StorageOrder{
        @param number of total rows
        @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
        */
-       Matrix(std::size_t rows = 0, std::size_t cols = 0) : rows(rows), cols(cols), compressed(false) {}
+       MatrixClass(std::size_t rows = 0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {}
         /*
         @brief non const call operator
         @param row index
@@ -64,17 +66,18 @@ enum StorageOrder{
         */
        void compress();
 
-        /*
-        @brief operator< overloading for column-major ordering in the case of column wise order
-        @param first array of indexes to compare
-        @param second array of indexes to compare with the first
-        @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
-        */
-       bool operator<(const idx & index1, const idx & index2)const;
-
+        
         
     
     };
 
 
 };
+
+/*
+        @brief operator< overloading for column-major ordering in the case of column wise order
+        @param first array of indexes to compare
+        @param second array of indexes to compare with the first
+        @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
+        */
+       bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
