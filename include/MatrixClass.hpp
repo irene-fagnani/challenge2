@@ -58,7 +58,9 @@ enum StorageOrder{
        @param number of total rows
        @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
        */
-       MatrixClass(std::size_t rows = 0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {compute_nzero();}
+       MatrixClass(std::size_t rows=0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {
+        compute_nzero();
+        resize_matrix(rows,cols);}
 
         /*
         @brief non const call operator
@@ -91,10 +93,12 @@ enum StorageOrder{
         @return compressed private member of the class
         */
        bool is_compressed() const;
+        
+        /*
+        @brief resize a given matrix, given the numbers of column and rows
+        */
+       void resize_matrix(std::size_ t rows, std::size_t cols);
 
-        
-        
-    
     };
 
 
