@@ -177,56 +177,96 @@ void resize_matrix(std::size_t rows, std::size_t cols){
      }
 }
 
-template<typename T, algebra::StorageOrder S>
+template<typename T, StorageOrder S>
 bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
 
-        if constexpr(S==algebra::StorageOrder::column_wise){
+        if constexpr(S==StorageOrder::column_wise){
 
            return (index1[0]<index2[0] || index1[0]==index2[0] && index1[1]<index2[1]);
 
         }
-       
-
-       if constexpr(S==algebra::StorageOrder::row_wise){
-
         return  (index1[1]<index2[1] || index1[1]==index2[1] && index1[0]<index2[0]);
 
-       }
+       
 }
 
-template<typename T>
-concept ComplexNumber = std::is_same<T, std::complex<typename T::value_type>>::value;
-
 template<typename T,StorageOrder S>
-std::vector<T> operator*(const std::vector<T> & v){
+std::vector<T> operator*(const MatrixClass<T,S> & A, const std::vector<T> & v){
 
-     std::vector<T> result(_rows);
+     if(v.size()!=A._cols){
+          std::cerr<<"The vector size does not match the matrix column size."<<std::endl;
+     }
+
+     std::vector<T> result(A._rows);
      if constexpr(S==StorageOrder::row_wise){
-         if(!compressed){
-               for(std::size_t i=0;i<_rows;++i){
-                    for(std::size_t j=0;j<_cols;++j){
-                         result[i]+=_data[{i,j}]*v[j];
+         if(!A.compressed){
+               for(std::size_t i=0;i<A._rows;++i){
+                    for(std::size_t j=0;j<A._cols;++j){
+                         result[i]+=A._data[{i,j}]*v[j];
                     }
                }
           }else{
-                for(std::size_t i=0;i<_rows;++i){
-                    for(std::size_t j=inner_indexes[i];j<inner_indexes[i+1];++j){
-                         result[i]+=values[j]*v[outer_indexes[j]];
+                for(std::size_t i=0;i<A._rows;++i){
+                    for(std::size_t j=A.inner_indexes[i];j<A.inner_indexes[i+1];++j){
+                         result[i]+=A.values[j]*v[A.outer_indexes[j]];
                     }
                }
           }
      }else if(S==StorageOrder::column_wise){
 
-          if(!compressed){
-               for(std::size_t i=0;i<_rows;++i){
-                    for(std::size_t j=0;j<_cols;++j){
-                         result[i]+=_data[{j,i}]*v[j];
+          if(!A.compressed){
+               for(std::size_t i=0;i<A._rows;++i){
+                    for(std::size_t j=0;j<A._cols;++j){
+                         result[i]+=A._data[{j,i}]*v[j];
                     }
                }
           }else{
-               for(std::size_t i=0;i<_rows;++i){
-                    for(std::size_t j=outer_indexes[i];j<outer_indexes[i+1];++j){
-                         result[i]+=values[j]*v[inner_indexes[j]];
+               for(std::size_t i=0;i<A._rows;++i){
+                    for(std::size_t j=A.outer_indexes[i];j<A.outer_indexes[i+1];++j){
+                         result[i]+=A.values[j]*v[A.inner_indexes[j]];
+                    }
+               }
+          }
+     }
+
+     return result;
+
+}
+
+template<typename T,StorageOrder S>
+std::vector<T> operator*( const std::vector<T> & v,const MatrixClass<T,S> & A){
+
+     if(v.size()!=A._rows){
+          std::cerr<<"The vector size does not match the matrix column size."<<std::endl;
+     }
+
+     std::vector<T> result(A._rows);
+     if constexpr(S==StorageOrder::row_wise){
+         if(!A.compressed){
+               for(std::size_t j=0;j<A._cols;++j){
+                    for(std::size_t i=0;j<A._rows;++i){
+                         result[j]+=A._data[{i,j}]*v[i];
+                    }
+               }
+          }else{
+                for(std::size_t j=0;j<A._cols;++j){
+                    for(std::size_t i=A.inner_indexes[j];i<A.inner_indexes[j+1];++i){
+                         result[j]+=A.values[i]*v[A.outer_indexes[i]];
+                    }
+               }
+          }
+     }else if(S==StorageOrder::column_wise){
+
+          if(!A.compressed){
+               for(std::size_t j=0;j<A._cols;++j){
+                    for(std::size_t i=0;j<A._rows;++i){
+                         result[j]+=A._data[{j,i}]*v[i];
+                    }
+               }
+          }else{
+               for(std::size_t j=0;j<A._cols;++j){
+                    for(std::size_t i=A.outer_indexes[j];i<A.outer_indexes[j+1];++i){
+                         result[j]+=A.values[i]*v[A.inner_indexes[i]];
                     }
                }
           }

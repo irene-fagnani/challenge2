@@ -51,7 +51,9 @@ enum StorageOrder{
 
        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
 
-       friend std::vector<T> operator*(std::vector<T> & v);
+       friend std::vector<T> operator*(const MatrixClass<T,S> & A,const std::vector<T> & v);
+
+       fiend std::vector<T> operator*(const std::vector<T> & v,const MatrixClass<T,S> & A);
        
        /*
        @brief constructor for the Matrix class
@@ -113,10 +115,18 @@ enum StorageOrder{
        bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
         
         /*
-        @brief operator* overloading for performing the multiplication between a matrix and a vector
+        @brief operator* overloading for performing the multiplication between a matrix A and a vector v, A*v
         @param vector that will be multiplicated with the matrix
         @return result of the multiplication
         */
        template<typename T, StorageOrder S>
-       std::vector<T> operator*(std::vector<T> & v);
+       std::vector<T> operator*(const MatrixClass<T,S> & A,const std::vector<T> & v);
+
+       /*
+        @brief operator* overloading for performing the multiplication between a vector v and a matrix A, v*A
+        @param vector that will be multiplicated with the matrix
+        @return result of the multiplication
+        */
+       template<typename T, StorageOrder S>
+       std::vector<T> operator*(const std::vector<T> & v,const MatrixClass<T,S> & A);
 };
