@@ -2,10 +2,9 @@
 #include <array>
 #include <iostream>
 #include <vector>
-
+#include <complex>
 
 namespace algebra{
-    
  /*
  @brief enumerator that indicates the storage ordering
  @param row_wise indicates the storage ordering by rows
@@ -51,6 +50,8 @@ enum StorageOrder{
        public:
 
        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+
+       friend std::vector<T> operator*(std::vector<T> & v);
        
        /*
        @brief constructor for the Matrix class
@@ -102,7 +103,6 @@ enum StorageOrder{
     };
 
 
-};
 
         /*
         @brief operator< overloading for column-major ordering in the case of column wise order
@@ -111,3 +111,12 @@ enum StorageOrder{
         @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
         */
        bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+        
+        /*
+        @brief operator* overloading for performing the multiplication between a matrix and a vector
+        @param vector that will be multiplicated with the matrix
+        @return result of the multiplication
+        */
+       template<typename T, StorageOrder S>
+       std::vector<T> operator*(std::vector<T> & v);
+};

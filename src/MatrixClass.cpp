@@ -176,7 +176,7 @@ void resize_matrix(std::size_t rows, std::size_t cols){
           }
      }
 }
-};
+
 template<typename T, algebra::StorageOrder S>
 bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
 
@@ -193,3 +193,47 @@ bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::s
 
        }
 }
+
+template<typename T>
+concept ComplexNumber = std::is_same<T, std::complex<typename T::value_type>>::value;
+
+template<typename T,StorageOrder S>
+std::vector<T> operator*(const std::vector<T> & v){
+
+     std::vector<T> result(_rows);
+     if constexpr(S==StorageOrder::row_wise){
+         if(!compressed){
+               for(std::size_t i=0;i<_rows;++i){
+                    for(std::size_t j=0;j<_cols;++j){
+                         result[i]+=_data[{i,j}]*v[j];
+                    }
+               }
+          }else{
+                for(std::size_t i=0;i<_rows;++i){
+                    for(std::size_t j=inner_indexes[i];j<inner_indexes[i+1];++j){
+                         result[i]+=values[j]*v[outer_indexes[j]];
+                    }
+               }
+          }
+     }else if(S==StorageOrder::column_wise){
+
+          if(!compressed){
+               for(std::size_t i=0;i<_rows;++i){
+                    for(std::size_t j=0;j<_cols;++j){
+                         result[i]+=_data[{j,i}]*v[j];
+                    }
+               }
+          }else{
+               for(std::size_t i=0;i<_rows;++i){
+                    for(std::size_t j=outer_indexes[i];j<outer_indexes[i+1];++j){
+                         result[i]+=values[j]*v[inner_indexes[j]];
+                    }
+               }
+          }
+     }
+
+     return result;
+
+}
+
+};
