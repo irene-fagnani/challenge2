@@ -15,7 +15,7 @@ $(TARGET): main.o
 	$(CXX) $(CXXFLAGS) main.o -o main
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) $(TARGET)
 
 distclean: clean
 	$(RM) *~
