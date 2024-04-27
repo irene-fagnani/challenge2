@@ -25,15 +25,15 @@ namespace algebra{
 
     private:
 
-        std::size_t _rows,_cols,_nnz=0;
+        std::size_t _rows,_cols,_nnz=0;  /**< Number of rows, columns and non zero elements of the matrix */
 
-        std::map<std::array<std::size_t,2>,T> _data;
+        std::map<std::array<std::size_t,2>,T> _data;  /**< Uncompressed form. Map that store as values non zero elements, as key the vector that stores the correspondents indexes in the matrix */
 
-        bool compressed;
+        bool compressed;  /**< True if the is stored in compressed form, false otherwise */
 
-        std::vector<T> values;
-        std::vector<std::size_t> inner_indexes;
-        std::vector<std::size_t> outer_indexes;
+        std::vector<T> values;  /**< Compressed form. Vector that stores the non zero elements.*/
+        std::vector<std::size_t> inner_indexes; /**< Compressed form. Vector that stores inner indexes. */
+        std::vector<std::size_t> outer_indexes; /**< Compressed form. Vector that stores outer indexes. */
 
         /**
         @brief check if the indexes provided are inside the dimension of the matrix or not
