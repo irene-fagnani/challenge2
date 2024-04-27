@@ -3,6 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <complex>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 namespace algebra{
  /*
@@ -53,7 +56,9 @@ enum StorageOrder{
 
        friend std::vector<T> operator*(const MatrixClass<T,S> & A,const std::vector<T> & v);
 
-       fiend std::vector<T> operator*(const std::vector<T> & v,const MatrixClass<T,S> & A);
+       friend std::vector<T> operator*(const std::vector<T> & v,const MatrixClass<T,S> & A);
+
+       friend MatrixClass<T,S> read_matrix(const std::string & filename);
        
        /*
        @brief constructor for the Matrix class
@@ -129,4 +134,12 @@ enum StorageOrder{
         */
        template<typename T, StorageOrder S>
        std::vector<T> operator*(const std::vector<T> & v,const MatrixClass<T,S> & A);
+    
+    /*
+    @brief given the name of the mtx file, the function write its content in a MatrixClass object
+    @param name of the mtx file
+    @return MatrixClass object
+    */
+       template<typename T, StorageOrder S>
+       MatrixClass<T,S> read_matrix(const std::string & filename);
 };

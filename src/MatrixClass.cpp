@@ -276,4 +276,56 @@ std::vector<T> operator*( const std::vector<T> & v,const MatrixClass<T,S> & A){
 
 }
 
+template<typename T, StorageOrder S>
+MatrixClass<T,S> read_matrix(const std::string & filename){
+     MatrixClass matrix;
+     std::ifstream file(filename);
+
+     if(!file.is_open()){
+          std::cerr<<"Cannot open the file."<<std::endl;
+          return matrix;
+     }
+
+     std::string line;
+     while(std::getline(file,line)){
+          if(line[0]=='%'){
+               continue;
+          }
+          std::stringstream ss(line);
+          std::string token;
+          std::vector<std::string> tokens;
+
+          while(ss>>token){
+               tokens.push_back(token);
+          }
+
+          if(tokens.size()!=3){
+               std::cerr<<"The matrix file is not in the correct format."<<std::endl;
+               return matrix;
+          }
+
+          if(tokens[0]=="%%MatrixMarket"){
+               if(tokens[1]!="matrix" || tokens[2]!="real" || tokens[2]!="integer"){
+                    std::cerr<<"Only general, real, matrices are supported. "<<std::endl;
+                    return matrix;
+               }
+          }else{
+               int rows=std::stoi(tokens[0]);
+               int cols=std::stoi(tokens[1]);
+               int nnz=std::stoi(tokens[2]);
+
+               for(int i=0;i<nnz;++i){
+                    std::getline(file,line);
+                    std::stringstream ss2(line);
+                    int row,col;
+                    T value;
+                    ss2>>row>>col>>value;
+                    matrix(row-1,col-1)=value;
+               }
+          }
+     }
+     file.close();
+     return matrix;
+}
+
 };
