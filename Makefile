@@ -11,8 +11,8 @@ INCLUDES:= -I$(INCLUDE_DIR)
 .PHONY: all clean
 %.o: $(SRC_DIR)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) $<
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $< -o $@
+$(TARGET): main.o
+	$(CXX) $(CXXFLAGS) main.o -o main
 
 clean:
 	$(RM) $(OBJS)
