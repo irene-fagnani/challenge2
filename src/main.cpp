@@ -18,6 +18,8 @@ int main(){
         std::cout<<elem<<std::endl;
     }
     
-    
+    algebra::MatrixClass<double, algebra::StorageOrder::row_wise> B;
+    B.read_matrix("lnsp_131.mtx");
+    B.print_matrix();
     return 0;
 }
