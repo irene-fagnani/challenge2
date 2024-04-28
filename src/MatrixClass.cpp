@@ -20,7 +20,7 @@ namespace algebra {
 
 
     template<typename T, StorageOrder S>
-    T &MatrixClass<T, S>::operator()(const std::size_t i, const std::size_t j) {
+    T & MatrixClass<T, S>::operator()(const std::size_t i, const std::size_t j) {
 
         if (!in_bound(i, j)) {
             std::cerr << "Index out of bounds." << std::endl;
@@ -40,17 +40,17 @@ namespace algebra {
                     if (outer_indexes[ii] == j) {
                         return values[ii];
                     }
-                    std::cerr << "In compressed case, cannot update the element." << std::endl;
                 }
             } else if constexpr (S == StorageOrder::column_wise) {
                 for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
                     if (inner_indexes[jj] == i) {
                         return values[jj];
                     }
-                    std::cerr << "In compressed case, cannot update the element." << std::endl;
+
                 }
             }
         }
+        std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
 
 
     }
@@ -84,15 +84,17 @@ namespace algebra {
                     if (outer_indexes[ii] == j) {
                         return values[ii];
                     }
-                    return 0;
+
                 }
+                return 0;
             } else if constexpr (S == StorageOrder::column_wise) {
                 for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
                     if (inner_indexes[jj] == i) {
                         return values[jj];
                     }
-                    return 0;
+
                 }
+                return 0;
             }
         }
 
@@ -101,36 +103,50 @@ namespace algebra {
 
     template<typename T, StorageOrder S>
     void MatrixClass<T, S>::compress() {
-        compute_nzero();
+
         if (is_compressed()) {
             std::cout
                     << "The matrix has already been compressed. If you want to compress it again, please decompress it first."
                     << std::endl;
             return;
         } else {
-            if constexpr (S == StorageOrder::row_wise) {
-                inner_indexes[0] = 0;
-                for (auto it = _data.begin(); it != _data.end(); ++it) {
-                    if (it->second != 0) {
-                        values.push_back(it->second);
-                        outer_indexes.push_back(it->first[1]);
-                        inner_indexes[it->first[0] + 1]++;
+            (S == StorageOrder::row_wise) ? inner_indexes.resize(_rows + 1, 0) : outer_indexes.resize(_cols+1, 0);
+            compute_nzero();
+            T value;
+            size_t i, j;
 
+            if constexpr (S == StorageOrder::row_wise) {
+                for (auto it = _data.begin(); it != _data.end(); ++it) {
+                    value = it->second;
+                    i = it->first[0];
+                    j = it->first[1];
+
+                    if (value != 0) {
+                        values.push_back(value);
+                        outer_indexes.push_back(j);
+                        inner_indexes[i + 1] =inner_indexes[i + 1] + ((inner_indexes[i + 1] == 0) ? inner_indexes[i] : 0);
+                        inner_indexes[i + 1]++;
                     }
                 }
             } else if constexpr (S == StorageOrder::column_wise) {
-                inner_indexes[0] = 0;
                 for (auto it = _data.begin(); it != _data.end(); ++it) {
-                    if (it->second != 0) {
-                        values.push_back(it->second);
-                        outer_indexes.push_back(it->first[0]);
-                        inner_indexes[it->first[1] + 1]++;
+                    value = it->second;
+                    j = it->first[0];
+                    i = it->first[1];
+
+                    if (value != 0) {
+                        values.push_back(value);
+                        inner_indexes.push_back(i);
+                        outer_indexes[j + 1] =outer_indexes[j + 1] + ((outer_indexes[j + 1] == 0) ? outer_indexes[j] : 0);
+                        outer_indexes[j + 1]++;
                     }
                 }
+
             }
+
+            _data.clear();
+            set_compressed(true);
         }
-        _data.clear();
-        set_compressed(true);
     }
 
     template<typename T, StorageOrder S>
@@ -149,8 +165,8 @@ namespace algebra {
 
             } else if constexpr (S == StorageOrder::column_wise) {
                 for (std::size_t i = 0; i < _cols; ++i) {
-                    for (std::size_t j = inner_indexes[i]; j < inner_indexes[i + 1]; j++) {
-                        _data[{i, outer_indexes[j]}] = values[j];
+                    for (std::size_t j = outer_indexes[i]; j < outer_indexes[i + 1]; j++) {
+                        _data[{i,inner_indexes[j]}] = values[j];
                     }
                 }
             }
@@ -233,52 +249,6 @@ namespace algebra {
 
     }
 
-/*
-
-template<typename T,StorageOrder S>
-std::vector<T> operator*( const std::vector<T> & v,const MatrixClass<T,S> & A){
-
-     if(v.size()!=A._rows){
-          std::cerr<<"The vector size does not match the matrix column size."<<std::endl;
-     }
-
-     std::vector<T> result(A._rows);
-     if constexpr(S==StorageOrder::row_wise){
-         if(!A.is_compressed()){
-               for(std::size_t j=0;j<A._cols;++j){
-                    for(std::size_t i=0;j<A._rows;++i){
-                         result[j]+=A(i,j)*v[i];
-                    }
-               }
-          }else{
-                for(std::size_t j=0;j<A._cols;++j){
-                    for(std::size_t i=A.inner_indexes[j];i<A.inner_indexes[j+1];++i){
-                         result[j]+=A.values[i]*v[A.outer_indexes[i]];
-                    }
-               }
-          }
-     }else if(S==StorageOrder::column_wise){
-
-          if(!A.is_compressed()){
-               for(std::size_t j=0;j<A._cols;++j){
-                    for(std::size_t i=0;j<A._rows;++i){
-                         result[j]+=A(i,j)*v[i];
-                    }
-               }
-          }else{
-               for(std::size_t j=0;j<A._cols;++j){
-                    for(std::size_t i=A.outer_indexes[j];i<A.outer_indexes[j+1];++i){
-                         result[j]+=A.values[i]*v[A.inner_indexes[i]];
-                    }
-               }
-          }
-     }
-
-     return result;
-
-}
-
-*/
 
     template<typename T, StorageOrder S>
     void MatrixClass<T, S>::read_matrix(const std::string &filename) {
@@ -328,13 +298,13 @@ std::vector<T> operator*( const std::vector<T> & v,const MatrixClass<T,S> & A){
     }
 
     template<typename T, StorageOrder S>
-    void MatrixClass<T, S>::print_matrix(){
-            for (std::size_t i = 0; i < _rows; ++i) {
-                for (std::size_t j = 0; j < _cols; ++j) {
-                    std::cout << (*this)(i, j) << " ";
-                }
-                std::cout << std::endl;
+    void MatrixClass<T, S>::print_matrix()const{
+        for (std::size_t i = 0; i < _rows; ++i) {
+            for (std::size_t j = 0; j < _cols; ++j) {
+                std::cout << (*this)(i, j) << " ";
             }
+            std::cout << std::endl;
+        }
 
     }
 

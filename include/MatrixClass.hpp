@@ -25,7 +25,9 @@ namespace algebra{
 
     private:
 
-        std::size_t _rows,_cols,_nnz=0;  /**< Number of rows, columns and non zero elements of the matrix */
+        std::size_t _rows;  /**< Number of rows. */
+        std::size_t _cols;  /**< Number of columns. */
+        std::size_t _nnz=0;  /**< Number of non zero elements in the matrix. */
 
         std::map<std::array<std::size_t,2>,T> _data;  /**< Uncompressed form. Map that store as values non zero elements, as key the vector that stores the correspondents indexes in the matrix */
 
@@ -138,13 +140,13 @@ namespace algebra{
         /**
         @brief print matrix
         */
-        void print_matrix();
+        void print_matrix()const;
 
     };
 
 
 
-    /*
+    /**
     @brief operator< overloading for column-major ordering in the case of column wise order
     @param first array of indexes to compare
     @param second array of indexes to compare with the first
