@@ -23,6 +23,7 @@ int main(){
     std::cout<<"A*v\n"<<std::endl;
 
 
+
     auto t0 = std::chrono::high_resolution_clock::now();
 
     std::vector<double> res = A*v;
@@ -103,7 +104,7 @@ int main(){
 
     std::cout<<((res6.is_compressed())?"compressed":"uncompressed")<<" : "<<delta_t_5.count()<<" ms"<<std::endl;
 
-    std::cout<<res6.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
+    std::cout<<res6.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;
 
     return 0;
 }

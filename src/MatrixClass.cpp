@@ -11,7 +11,7 @@ namespace algebra {
     template<typename T, StorageOrder S>
     void MatrixClass<T, S>::compute_nzero() {
         for (auto it = _data.begin(); it != _data.end(); it++) {
-            if (it->second != 0) {
+            if (it->second != T{}) {
                 _nnz++;
             }
         }
@@ -325,45 +325,35 @@ namespace algebra {
     }
 
     
-    template<typename T, StorageOrder S>
+   template<typename T, StorageOrder S>
     template<NormMethod N>
     decltype(auto) MatrixClass<T,S>::compute_norm()const{
-        
+
         decltype(auto) norm=0.0;
 
         if constexpr(N==NormMethod::infinity_norm){
             decltype(auto) sum=0.0;
-            if(!compressed){
                 for(std::size_t i=0;i<_rows;++i){
                     sum=0;
-                    for(std::size_t j=0;j<_cols;++j){
-                        if constexpr(S==StorageOrder::row_wise){
-                        sum+=std::abs(_data[{i,j}]);
-                        }else{
-                            sum+=std::abs(_data[{j,i}]);
-                        }
+                    for(std::size_t j=0;j<_cols;++j) {
+                        sum += std::abs((*this)(i, j));
                     }
                     norm=std::max(norm,sum);
-                }
+
             }
             return norm;
         }
-        
+
         if constexpr(N==NormMethod::one_norm){
             decltype(auto) sum=0.0;
-            if(!compressed){
                 for(std::size_t j=0;j<_cols;++j){
                     sum=0;
                     for(std::size_t i=0;i<_rows;++i){
-                        if constexpr(S==StorageOrder::row_wise){
-                        sum+=std::abs(_data[{i,j}]);
-                        }else{
-                            sum+=std::abs(_data[{j,i}]);
-                        }
+                        sum+=std::abs((*this)(i,j));
                     }
                     norm=std::max(norm,sum);
                 }
-            }
+
             return norm;
         }
 
@@ -377,9 +367,9 @@ namespace algebra {
                     norm += std::abs(values[i])*std::abs(values[i]);
                 }
             }
-             return std::sqrt(norm);
+            return std::sqrt(norm);
         }
-        
+
     }
 
 };
