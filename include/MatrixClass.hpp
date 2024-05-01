@@ -158,8 +158,6 @@ namespace algebra{
         template<StorageOrder S1>
         MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs);
         
-        
-
 
         /**
          * @brief print matrix

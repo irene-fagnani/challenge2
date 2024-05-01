@@ -370,7 +370,7 @@ namespace algebra {
         if constexpr(N==NormMethod::Frobenius_norm){
             if(!compressed){
                 for(const auto & elem: _data){
-                    norm += std::abs(elem->second)*std::abs(elem->second);
+                    norm += std::abs(elem.second)*std::abs(elem.second);
                 }
             }else{
                 for(std::size_t i=0;i<values.size();++i){

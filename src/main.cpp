@@ -103,5 +103,7 @@ int main(){
 
     std::cout<<((res6.is_compressed())?"compressed":"uncompressed")<<" : "<<delta_t_5.count()<<" ms"<<std::endl;
 
+    std::cout<<res6.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
+
     return 0;
 }
