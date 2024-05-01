@@ -150,6 +150,16 @@ namespace algebra{
 
         std::vector<T> operator*(const std::vector<T> & v);
 
+        /**
+         * @brief operator* overloading for performing the multiplication between two matrices (general case)
+         * @param matrix that will be multiplicted with this
+         * @return result of the multiplication (it is of type MatrixClass)
+         */
+        template<StorageOrder S1>
+        MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs);
+        
+        
+
 
         /**
          * @brief print matrix

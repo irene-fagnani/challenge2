@@ -297,6 +297,22 @@ namespace algebra {
         file.close();
     }
 
+
+    template<typename T,StorageOrder S>
+    template<StorageOrder S1>
+    MatrixClass<T,StorageOrder::row_wise> MatrixClass<T,S>::operator*(MatrixClass<T,S1> const & lhs){
+    
+    MatrixClass<T,StorageOrder::row_wise> result(_rows,lhs.get_cols());
+    for(std::size_t i=0;i<get_rows();++i){
+        for(std::size_t j=0;j<lhs.get_cols();++j){
+            for(std::size_t k=0;k<lhs.get_rows();++k){
+                result(i,j)+=((*this)(i,k))*(lhs(k,j));
+            }
+        }
+    }
+    return result;
+    }
+
     template<typename T, StorageOrder S>
     void MatrixClass<T, S>::print_matrix()const{
         for (std::size_t i = 0; i < _rows; ++i) {

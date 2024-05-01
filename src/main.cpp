@@ -92,5 +92,16 @@ int main(){
     
     std::cout << ((B2.is_compressed())?"compressed":"uncompressed") << " : " << delta_t_4.count() << " ms" << std::endl;
 
+    std::cout<<"\nB2*B1\n"<<std::endl;
+
+    auto t0_5=std::chrono::high_resolution_clock::now();
+
+    algebra::MatrixClass<double,algebra::StorageOrder::row_wise> res6=B2*B1;
+
+    auto t1_5=std::chrono::high_resolution_clock::now();
+    auto delta_t_5 = std::chrono::duration_cast<std::chrono::microseconds>(t1_5-t0_5);
+
+    std::cout<<((res6.is_compressed())?"compressed":"uncompressed")<<" : "<<delta_t_5.count()<<" ms"<<std::endl;
+
     return 0;
 }
