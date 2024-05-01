@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -std=c++20
-CPPFLAGS=-Wall -Wextra 
+CPPFLAGS=-Wall -Wextra -O3
 SRC_DIR = src
 INCLUDE_DIR = include
 TARGET = main

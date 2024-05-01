@@ -237,9 +237,9 @@ namespace algebra {
                     }
                 }
             } else {
-                for (std::size_t i = 0; i < _rows; ++i) {
-                    for (std::size_t j = outer_indexes[i]; j < outer_indexes[i + 1]; ++j) {
-                        result[i] += values[j] * v[inner_indexes[j]];
+                for (std::size_t j = 0; j < _cols; ++j) {
+                    for (std::size_t i = outer_indexes[j]; i < outer_indexes[j + 1]; ++i) {
+                        result[inner_indexes[i]] += values[i] * v[j];
                     }
                 }
             }
