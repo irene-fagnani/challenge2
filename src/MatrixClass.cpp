@@ -213,12 +213,12 @@ namespace algebra {
             std::cerr << "The vector size does not match the matrix column size." << std::endl;
         }
 
-        std::vector<T> result(_rows);
+        std::vector<T> result(_rows,0);
         if constexpr (S == StorageOrder::row_wise) {
             if (!compressed) {
                 for (std::size_t i = 0; i < _rows; ++i) {
-                    for (std::size_t j = 0; j < _cols; ++j) {
-                        result[i] += _data[{i, j}] * v[j];
+                    for (auto it = _data.lower_bound({i, 0}); it != _data.upper_bound({i, _cols - 1}); ++it) {
+                        result[i] += (it->second) * v[it->first[1]];
                     }
                 }
             } else {
@@ -230,10 +230,10 @@ namespace algebra {
             }
         } else if (S == StorageOrder::column_wise) {
 
-            if (!compressed) {
-                for (std::size_t i = 0; i < _rows; ++i) {
+            if (!compressed){
                     for (std::size_t j = 0; j < _cols; ++j) {
-                        result[i] += _data[{j, i}] * v[j];
+                        for(auto it=_data.lower_bound({j,0});it!=_data.upper_bound({j,_rows-1});++it){
+                            result[it->first[1]]+=(it->second)*v[j];
                     }
                 }
             } else {
