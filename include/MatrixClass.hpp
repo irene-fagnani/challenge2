@@ -197,7 +197,51 @@ namespace algebra{
         /**
          * @brief perform the compression, according the storage order defined at compile time
         */
-        void compress();
+        void compress(){
+             if (is_compressed()) {
+            std::cout
+                    << "The matrix has already been compressed. If you want to compress it again, please decompress it first."
+                    << std::endl;
+            return;
+        } else {
+            (S == StorageOrder::row_wise) ? inner_indexes.resize(_rows + 1, 0) : outer_indexes.resize(_cols+1, 0);
+            compute_nzero();
+            T value;
+            size_t i, j;
+
+            if constexpr (S == StorageOrder::row_wise) {
+                for (auto it = _data.begin(); it != _data.end(); ++it) {
+                    value = it->second;
+                    i = it->first[0];
+                    j = it->first[1];
+
+                    if (value != 0) {
+                        values.push_back(value);
+                        outer_indexes.push_back(j);
+                        inner_indexes[i + 1] =inner_indexes[i + 1] + ((inner_indexes[i + 1] == 0) ? inner_indexes[i] : 0);
+                        inner_indexes[i + 1]++;
+                    }
+                }
+            } else if constexpr (S == StorageOrder::column_wise) {
+                for (auto it = _data.begin(); it != _data.end(); ++it) {
+                    value = it->second;
+                    j = it->first[0];
+                    i = it->first[1];
+
+                    if (value != 0) {
+                        values.push_back(value);
+                        inner_indexes.push_back(i);
+                        outer_indexes[j + 1] =outer_indexes[j + 1] + ((outer_indexes[j + 1] == 0) ? outer_indexes[j] : 0);
+                        outer_indexes[j + 1]++;
+                    }
+                }
+
+            }
+
+            _data.clear();
+            set_compressed(true);
+        }
+        }
 
         /**
          * @brief perform the decompression, according the storage order defined at compile time
