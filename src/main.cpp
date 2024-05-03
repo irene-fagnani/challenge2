@@ -1,4 +1,4 @@
-#include "MatrixClass.cpp"
+#include "MatrixClass.hpp"
 #include <chrono>
 
 int main(){

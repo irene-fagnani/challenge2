@@ -76,23 +76,8 @@ namespace algebra{
 
     public:
 
-    /**
-     * @brief operator< overloading for column-major ordering in the case of column wise order
-     * @param first array of indexes to compare
-     * @param second array of indexes to compare with the first
-     * @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
-    */
-    bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
-         if constexpr (S == StorageOrder::column_wise) {
-
-            return (index1[0] < index2[0] || index1[0] == index2[0] && index1[1] < index2[1]);
-
-        }
-        return (index1[1] < index2[1] || index1[1] == index2[1] && index1[0] < index2[0]);
-
-    }
-
-
+       friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+       
         /**
          * @brief constructor for the Matrix class
          * @param number of total columns
@@ -501,5 +486,22 @@ namespace algebra{
     }
 
     };
+
+    /**
+     * @brief operator< overloading for column-major ordering in the case of column wise order
+     * @param first array of indexes to compare
+     * @param second array of indexes to compare with the first
+     * @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
+    */
+    template<StorageOrder S>
+    bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
+         if constexpr (S == StorageOrder::column_wise) {
+
+            return (index1[0] < index2[0] || index1[0] == index2[0] && index1[1] < index2[1]);
+
+        }
+        return (index1[1] < index2[1] || index1[1] == index2[1] && index1[0] < index2[0]);
+
+    }
 
 };
