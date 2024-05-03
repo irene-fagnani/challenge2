@@ -5,47 +5,12 @@
 #include <cmath>
 #include <vector>
 #include <sstream>
-
+#include "MatrixClass_utilities.hpp"
 
 #ifndef MATRIXCLASS_HPP
 #define MATRIXCLASS_HPP
 
 namespace algebra{    
-
-      /*!
-     * @brief enumerator that indicates the storage ordering
-     * @param row_wise indicates the storage ordering by rows
-     * @param column_wise indicates the sorage ordering by columns
-    */
-    enum StorageOrder{
-        row_wise,
-        column_wise
-    };
-     /*!
-     * @brief enumerator that indicates the norm method
-     * @param one_norm indicates the one norm
-     * @param infinity_norm indicates the infinity norm
-     * @param Frobenius_norm indicates the Frobenius norm
-     */
-    enum NormMethod{
-        one_norm,
-        infinity_norm,
-        Frobenius_norm
-    };
-
-    /*!
-     * @brief primary template
-     * @tparam T value type
-     */
-    template<typename T>
-    struct is_complex : std::false_type {};
-    /*!
-     * @brief patrial specialization for complex numbers
-     * @tparam T value type
-     */
-    template<typename T>
-    struct is_complex<std::complex<T>> : std::true_type {};
-
     /*!
      * @brief dynamic matrix class template
      * @tparam T type of the elements in the matrix
@@ -68,6 +33,20 @@ namespace algebra{
         std::vector<std::size_t> inner_indexes; /*!< Compressed form. Vector that stores inner indexes. */
         std::vector<std::size_t> outer_indexes; /*!< Compressed form. Vector that stores outer indexes. */
 
+
+    public:
+
+        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+       
+        /*!
+         * @brief constructor for the Matrix class
+         * @param number of total columns
+         * @param number of total rows
+         * @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
+        */
+        MatrixClass(std::size_t rows=0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {
+            compute_nzero();
+            resize_matrix(rows,cols);}
         /*!
          * @brief check if the indexes provided are inside the dimension of the matrix or not
          * @param row index
@@ -88,22 +67,6 @@ namespace algebra{
             }
         }
         }
-
-    public:
-
-       friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
-
-
-
-        /*!
-         * @brief constructor for the Matrix class
-         * @param number of total columns
-         * @param number of total rows
-         * @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
-        */
-        MatrixClass(std::size_t rows=0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {
-            compute_nzero();
-            resize_matrix(rows,cols);}
 
         /*!
          * @brief return _rows
@@ -127,89 +90,15 @@ namespace algebra{
          * @param column index
          * @param value to add in the matrix in (i,j) position
         */
-        T & operator()(const std::size_t i,const std::size_t j){
-            if (!in_bound(i, j)) {
-            std::cerr << "Index out of bounds." << std::endl;
-        }
-        if (!is_compressed()) {
-            if constexpr (S == StorageOrder::row_wise) {
-                return _data[{i, j}];
-            }
-
-            if constexpr (S == StorageOrder::column_wise) {
-                return _data[{j, i}];
-            }
-
-        } else {
-            if constexpr (S == StorageOrder::row_wise) {
-                for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
-                    if (outer_indexes[ii] == j) {
-                        return values[ii];
-                    }
-                }
-            } else if constexpr (S == StorageOrder::column_wise) {
-                for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
-                    if (inner_indexes[jj] == i) {
-                        return values[jj];
-                    }
-
-                }
-            }
-        }
-        std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
-
-
-        }
-
+        T & operator()(const std::size_t i,const std::size_t j);
+        
         /*!
          * @brief const call operator
          * @param row index
          * @param column index
          * @param value to add in the matrix in (i,j) position
         */
-        T operator()(const std::size_t i,const std::size_t j) const{
-             if (!in_bound(i, j)) {
-            std::cerr << "Index out of bounds." << std::endl;
-        }
-        if (!is_compressed()) {
-            if constexpr (S == StorageOrder::row_wise) {
-                if (_data.find({i, j}) == _data.end()) {
-                    return 0;
-                } else {
-                    return _data.at({i, j});
-                }
-
-
-            }
-            if constexpr (S == StorageOrder::column_wise) {
-                if (_data.find({j, i}) == _data.end()) {
-                    return 0;
-                } else {
-                    return _data.at({j, i});
-                }
-
-            }
-        } else {
-            if constexpr (S == StorageOrder::row_wise) {
-                for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
-                    if (outer_indexes[ii] == j) {
-                        return values[ii];
-                    }
-
-                }
-                return 0;
-            } else if constexpr (S == StorageOrder::column_wise) {
-                for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
-                    if (inner_indexes[jj] == i) {
-                        return values[jj];
-                    }
-
-                }
-                return 0;
-            }
-        }
-
-        }
+        T operator()(const std::size_t i,const std::size_t j) const;
 
         /*!
          * @brief perform the compression, according the storage order defined at compile time
@@ -266,7 +155,7 @@ namespace algebra{
         void uncompress(){
              compute_nzero();
         if (!is_compressed()) {
-            std::cout << "The matrix has not been compressed yet." << std::endl;
+            std::cout << "The matrix has already been uncompressed. If you want to uncompress it again, please compress it first." << std::endl;
             return;
         } else {
             if constexpr (S == StorageOrder::row_wise) {
@@ -313,10 +202,14 @@ namespace algebra{
             if (!is_compressed()) {
             for (std::size_t i = 0; i < rows; ++i) {
                 for (std::size_t j = 0; j < cols; ++j) {
+                    if constexpr(S==StorageOrder::row_wise){
                     _data[{i, j}] = 0;
-                }
+                    }else if constexpr(S==StorageOrder::column_wise){
+                        _data[{j,i}]=0;
+                    }
+               }
             }
-            }
+        }
         }
 
         /*!
@@ -528,7 +421,7 @@ namespace algebra{
 
     }
 
-      /*!
+    /*!
     * @brief this function print an object of type MatrixClass
     */
 
@@ -546,23 +439,6 @@ namespace algebra{
         }
     }
     };
-
-    /*!
-     * @brief operator< overloading for column-major ordering in the case of column wise order
-     * @param first array of indexes to compare
-     * @param second array of indexes to compare with the first
-     * @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
-    */
-    template<StorageOrder S>
-    bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
-         if constexpr (S == StorageOrder::column_wise) {
-
-            return (index1[0] < index2[0] || index1[0] == index2[0] && index1[1] < index2[1]);
-
-        }
-        return (index1[1] < index2[1] || index1[1] == index2[1] && index1[0] < index2[0]);
-
-    }
 
 };
 
