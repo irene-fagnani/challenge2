@@ -502,7 +502,4 @@ namespace algebra{
 
     };
 
-
-
-
 };
