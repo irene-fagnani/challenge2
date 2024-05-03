@@ -1,15 +1,18 @@
 #include <map>
-#include <array>
 #include <iostream>
-#include <vector>
 #include <complex>
 #include <fstream>
-#include <string>
 #include <cmath>
-#include <type_traits>
+#include <vector>
 #include <sstream>
-namespace algebra{
-    /*!
+
+
+#ifndef MATRIXCLASS_HPP
+#define MATRIXCLASS_HPP
+
+namespace algebra{    
+
+      /*!
      * @brief enumerator that indicates the storage ordering
      * @param row_wise indicates the storage ordering by rows
      * @param column_wise indicates the sorage ordering by columns
@@ -18,9 +21,7 @@ namespace algebra{
         row_wise,
         column_wise
     };
-    
-
-    /*!
+     /*!
      * @brief enumerator that indicates the norm method
      * @param one_norm indicates the one norm
      * @param infinity_norm indicates the infinity norm
@@ -31,7 +32,7 @@ namespace algebra{
         infinity_norm,
         Frobenius_norm
     };
-    
+
     /*!
      * @brief primary template
      * @tparam T value type
@@ -91,6 +92,8 @@ namespace algebra{
     public:
 
        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+
+
 
         /*!
          * @brief constructor for the Matrix class
@@ -350,8 +353,13 @@ namespace algebra{
                     std::cerr << "Only general, real, matrices are supported. " << std::endl;
                 }
             } else {
+                if constexpr(S==StorageOrder::row_wise){
                 _rows = std::stoi(tokens[0]);
                 _cols = std::stoi(tokens[1]);
+                }else if constexpr(S==StorageOrder::column_wise){
+                _cols = std::stoi(tokens[0]);
+                _rows = std::stoi(tokens[1]);  
+                }
                 _nnz = std::stoi(tokens[2]);
 
                 for (int i = 0; i < _nnz; ++i) {
@@ -359,7 +367,11 @@ namespace algebra{
                     std::stringstream ss2(line);
                     int row, col;
                     T value;
+                    if constexpr(S==StorageOrder::row_wise){
                     ss2 >> row >> col >> value;
+                    }else if constexpr(S==StorageOrder::column_wise){
+                        ss2>>col>>row>>value;
+                    }
                     _data[{row - 1, col - 1}] = value;
                 }
             }
@@ -468,38 +480,17 @@ namespace algebra{
 
     
     return result;
-
     }
     
-
-        
-
-        /*!
-         * @brief this function print an object of type MatrixClass
-        */
-        void print_matrix()const{
-        for (std::size_t i = 0; i < _rows; ++i) {
-            for (std::size_t j = 0; j < _cols; ++j) {
-                if constexpr(is_complex<T>{}){
-                    std::cout << std::real((*this)(i, j)) << " + " << std::imag((*this)(i, j)) << "i   ";
-                }else{
-                    std::cout << (*this)(i, j) << " ";
-                }
-                
-            }
-            std::cout << std::endl;
-        }
-        }
         /*!
          * @brief compute the norm of the matrix, according to the specified norm method
          * @tparam N NormMethod specified the wanted norm method computation
          * @return double result of the norm computation
          */
-        template<NormMethod N>
-        decltype(auto) compute_norm()const{
-
-        decltype(auto) norm=0.0;
-
+      
+     template<NormMethod N>
+     decltype(auto) compute_norm()const{
+      decltype(auto) norm=0.0;
         if constexpr(N==NormMethod::infinity_norm){
             decltype(auto) sum=0.0;
                 for(std::size_t i=0;i<_rows;++i){
@@ -527,20 +518,33 @@ namespace algebra{
         }
 
         if constexpr(N==NormMethod::Frobenius_norm){
-            if(!compressed){
-                for(const auto & elem: _data){
-                    norm += std::abs(elem.second)*std::abs(elem.second);
+                for(std::size_t i=0;i<_rows;++i){
+                    for(std::size_t j=0;j<_cols;++j){
+                        norm+=std::abs((*this)(i,j))*std::abs((*this)(i,j));
+                    }
                 }
-            }else{
-                for(std::size_t i=0;i<values.size();++i){
-                    norm += std::abs(values[i])*std::abs(values[i]);
-                }
-            }
             return std::sqrt(norm);
         }
 
     }
 
+      /*!
+    * @brief this function print an object of type MatrixClass
+    */
+
+    void print_matrix()const{
+        for (std::size_t i = 0; i <_rows; ++i) {
+            for (std::size_t j = 0; j < _cols; ++j) {
+                if constexpr(is_complex<T>{}){
+                    std::cout << std::real((*this)(i, j)) << " + " << std::imag((*this)(i, j)) << "i   ";
+                }else{
+                    std::cout << (*this)(i, j) << " ";
+                }
+                
+            }
+            std::cout << std::endl;
+        }
+    }
     };
 
     /*!
@@ -561,3 +565,5 @@ namespace algebra{
     }
 
 };
+
+#endif
