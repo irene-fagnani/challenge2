@@ -3,7 +3,7 @@
 
 int main(){
 
-    algebra::MatrixClass<double,algebra::StorageOrder::row_wise> A(3,3);
+    algebra::MatrixClass<std::complex<double>,algebra::StorageOrder::row_wise> A(3,3);
 
     A(0,0)=1;
     A(0,1)=2;
@@ -15,7 +15,7 @@ int main(){
     A(2,1)=8;
     A(2,2)=9;
 
-    std::vector<double> v = {1,2,3};
+    std::vector<std::complex<double>> v = {1,2,3};
 
     A.compress();
     A.print_matrix();
@@ -26,7 +26,7 @@ int main(){
 
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<double> res = A*v;
+    std::vector<std::complex<double>> res = A*v;
 
     auto t1 = std::chrono::high_resolution_clock::now();
     auto delta_t = std::chrono::duration_cast<std::chrono::microseconds>(t1-t0);

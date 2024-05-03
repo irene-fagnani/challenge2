@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+#include <type_traits>
 #include <sstream>
 namespace algebra{
     /**
@@ -30,6 +31,19 @@ namespace algebra{
         infinity_norm,
         Frobenius_norm
     };
+    
+    /**
+     * @brief primary template
+     * @tparam T value type
+     */
+    template<typename T>
+    struct is_complex : std::false_type {};
+    /**
+     * @brief patrial specialization for complex numbers
+     * @tparam T value type
+     */
+    template<typename T>
+    struct is_complex<std::complex<T>> : std::true_type {};
 
     /**
      * @brief dynamic matrix class template
@@ -215,7 +229,7 @@ namespace algebra{
                     i = it->first[0];
                     j = it->first[1];
 
-                    if (value != 0) {
+                    if (value != T{}) {
                         values.push_back(value);
                         outer_indexes.push_back(j);
                         inner_indexes[i + 1] =inner_indexes[i + 1] + ((inner_indexes[i + 1] == 0) ? inner_indexes[i] : 0);
@@ -228,7 +242,7 @@ namespace algebra{
                     j = it->first[0];
                     i = it->first[1];
 
-                    if (value != 0) {
+                    if (value != T{}) {
                         values.push_back(value);
                         inner_indexes.push_back(i);
                         outer_indexes[j + 1] =outer_indexes[j + 1] + ((outer_indexes[j + 1] == 0) ? outer_indexes[j] : 0);
@@ -365,7 +379,7 @@ namespace algebra{
             std::cerr << "The vector size does not match the matrix column size." << std::endl;
         }
 
-        std::vector<T> result(_rows,0);
+        std::vector<T> result(_rows,T{});
         if constexpr (S == StorageOrder::row_wise) {
             if (!compressed) {
                 for (std::size_t i = 0; i < _rows; ++i) {
@@ -466,7 +480,12 @@ namespace algebra{
         void print_matrix()const{
         for (std::size_t i = 0; i < _rows; ++i) {
             for (std::size_t j = 0; j < _cols; ++j) {
-                std::cout << (*this)(i, j) << " ";
+                if constexpr(is_complex<T>{}){
+                    std::cout << std::real((*this)(i, j)) << " + " << std::imag((*this)(i, j)) << "i   ";
+                }else{
+                    std::cout << (*this)(i, j) << " ";
+                }
+                
             }
             std::cout << std::endl;
         }
