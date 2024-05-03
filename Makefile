@@ -15,7 +15,7 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	$(RM) $(OBJS) 
+	$(RM) $(OBJS) $(TARGET)
 
 distclean: clean
 	$(RM) *~
