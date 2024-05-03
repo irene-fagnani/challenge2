@@ -424,10 +424,16 @@ namespace algebra{
         
 
         /**
-         * @brief print matrix
+         * @brief this function print an object of type MatrixClass
         */
-        void print_matrix()const;
-        
+        void print_matrix()const{
+        for (std::size_t i = 0; i < _rows; ++i) {
+            for (std::size_t j = 0; j < _cols; ++j) {
+                std::cout << (*this)(i, j) << " ";
+            }
+            std::cout << std::endl;
+        }
+        }
         /**
          * @brief compute the norm of the matrix, according to the specified norm method
          * @tparam N NormMethod specified the wanted norm method computation
