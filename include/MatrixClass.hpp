@@ -405,7 +405,7 @@ namespace algebra{
         /**
          * @brief operator* overloading for performing the multiplication between two objects of type MatrixClass (general case)
          * @param matrix that will be multiplicted with this
-         * @return result of the multiplication (it is of type MatrixClass)
+         * @return result of the multiplication (it is of type MatrixClass and of StorageOrder::row_wise)
          */
         template<StorageOrder S1>
         MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs){
