@@ -77,7 +77,7 @@ namespace algebra{
     public:
 
        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
-       
+
         /**
          * @brief constructor for the Matrix class
          * @param number of total columns
@@ -403,23 +403,60 @@ namespace algebra{
 
 
         /**
-         * @brief operator* overloading for performing the multiplication between two matrices (general case)
+         * @brief operator* overloading for performing the multiplication between two objects of type MatrixClass (general case)
          * @param matrix that will be multiplicted with this
          * @return result of the multiplication (it is of type MatrixClass)
          */
         template<StorageOrder S1>
         MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs){
+            if(_cols!=lhs.get_rows()){
+                std::cerr<<"The number of columns of the first matrix must be equal to the number of rows of the second matrix."<<std::endl;
+            }
     
-    MatrixClass<T,StorageOrder::row_wise> result(_rows,lhs.get_cols());
-    for(std::size_t i=0;i<get_rows();++i){
-        for(std::size_t j=0;j<lhs.get_cols();++j){
-            for(std::size_t k=0;k<lhs.get_rows();++k){
-                result(i,j)+=((*this)(i,k))*(lhs(k,j));
+            MatrixClass<T,StorageOrder::row_wise> result(_rows,lhs.get_cols());
+        if constexpr (S == StorageOrder::row_wise) {
+            if (!compressed) {
+                for(std::size_t k=0;k<lhs.get_cols();++k){
+                    for (std::size_t i = 0; i < _rows; ++i) {
+                        for (auto it = _data.lower_bound({i, 0}); it != _data.upper_bound({i, _cols - 1}); ++it) {
+                            result(i,k) += (it->second) * lhs(it->first[1],k);
+                        }
+                    }
+                }
+            } else {
+                for(std::size_t k=0;k<lhs.get_cols();++k){
+                    for (std::size_t i = 0; i < _rows; ++i) {
+                        for (std::size_t j = inner_indexes[i]; j < inner_indexes[i + 1]; ++j) {
+                            result(i,k) += values[j] * lhs(outer_indexes[j],k);
+                        }
+                    }
+                }
+            }
+        } else if (S == StorageOrder::column_wise) {
+            if (!compressed){
+                for(std::size_t k=0;k<lhs.get_cols();++k){
+                    for (std::size_t j = 0; j < _cols; ++j) {
+                        for(auto it=_data.lower_bound({j,0});it!=_data.upper_bound({j,_rows-1});++it){
+                            result(it->first[1],k)+=(it->second)*lhs(j,k);
+                        }
+                    }
+                }
+            } else {
+                for(std::size_t k=0;k<lhs.get_cols();++k){
+                    for (std::size_t j = 0; j < _cols; ++j) {
+                        for (std::size_t i = outer_indexes[j]; i < outer_indexes[j + 1]; ++i) {
+                            result(inner_indexes[i],k) += values[i] * lhs(j,k);
+                        }
+                    }
+                }
             }
         }
-    }
+
+    
     return result;
+
     }
+    
 
         
 

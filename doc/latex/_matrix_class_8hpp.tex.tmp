@@ -1,0 +1,42 @@
+\hypertarget{_matrix_class_8hpp}{}\doxysection{include/\+Matrix\+Class.hpp File Reference}
+\label{_matrix_class_8hpp}\index{include/MatrixClass.hpp@{include/MatrixClass.hpp}}
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$array$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$complex$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for Matrix\+Class.\+hpp\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classalgebra_1_1_matrix_class}{algebra\+::\+Matrix\+Class$<$ T, S $>$}}
+\begin{DoxyCompactList}\small\item\em dynamic matrix class template \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespacealgebra}{algebra}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacealgebra_af7f291bc9289c8ac99068a8ae4873108}{algebra\+::\+Storage\+Order}} \{ \mbox{\hyperlink{namespacealgebra_af7f291bc9289c8ac99068a8ae4873108a2cea0272c4e409254b3a8a058f537733}{algebra\+::row\+\_\+wise}}
+, \mbox{\hyperlink{namespacealgebra_af7f291bc9289c8ac99068a8ae4873108ac659024731b70fe6e018b62c83ff3152}{algebra\+::column\+\_\+wise}}
+ \}
+\begin{DoxyCompactList}\small\item\em enumerator that indicates the storage ordering \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespacealgebra_a2ac3289f7e7571f904b5b11e2dc04b19}{algebra\+::\+Norm\+Method}} \{ \mbox{\hyperlink{namespacealgebra_a2ac3289f7e7571f904b5b11e2dc04b19a4decf6549ee8d85a6283531ab652ebdb}{algebra\+::one\+\_\+norm}}
+, \mbox{\hyperlink{namespacealgebra_a2ac3289f7e7571f904b5b11e2dc04b19a21b5f0bccb121c114c2ba71b0117df8e}{algebra\+::infinity\+\_\+norm}}
+, \mbox{\hyperlink{namespacealgebra_a2ac3289f7e7571f904b5b11e2dc04b19a58d482293218b07e6b8fc9bb0f7aa93b}{algebra\+::\+Frobenius\+\_\+norm}}
+ \}
+\begin{DoxyCompactList}\small\item\em enumerator that indicates the norm method \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$Storage\+Order S$>$ }\\bool \mbox{\hyperlink{namespacealgebra_adf8d6835876ba204a6999aefc74884aa}{algebra\+::operator$<$}} (const std\+::array$<$ std\+::size\+\_\+t, 2 $>$ \&index1, const std\+::array$<$ std\+::size\+\_\+t, 2 $>$ \&index2)
+\begin{DoxyCompactList}\small\item\em operator$<$ overloading for column-\/major ordering in the case of column wise order \end{DoxyCompactList}\end{DoxyCompactItemize}
