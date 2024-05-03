@@ -359,7 +359,48 @@ namespace algebra{
          * @return result of the multiplication
         */
 
-        std::vector<T> operator*(const std::vector<T> & v);
+        std::vector<T> operator*(const std::vector<T> & v){
+
+        if (v.size() != _cols) {
+            std::cerr << "The vector size does not match the matrix column size." << std::endl;
+        }
+
+        std::vector<T> result(_rows,0);
+        if constexpr (S == StorageOrder::row_wise) {
+            if (!compressed) {
+                for (std::size_t i = 0; i < _rows; ++i) {
+                    for (auto it = _data.lower_bound({i, 0}); it != _data.upper_bound({i, _cols - 1}); ++it) {
+                        result[i] += (it->second) * v[it->first[1]];
+                    }
+                }
+            } else {
+                for (std::size_t i = 0; i < _rows; ++i) {
+                    for (std::size_t j = inner_indexes[i]; j < inner_indexes[i + 1]; ++j) {
+                        result[i] += values[j] * v[outer_indexes[j]];
+                    }
+                }
+            }
+        } else if (S == StorageOrder::column_wise) {
+
+            if (!compressed){
+                    for (std::size_t j = 0; j < _cols; ++j) {
+                        for(auto it=_data.lower_bound({j,0});it!=_data.upper_bound({j,_rows-1});++it){
+                            result[it->first[1]]+=(it->second)*v[j];
+                    }
+                }
+            } else {
+                for (std::size_t j = 0; j < _cols; ++j) {
+                    for (std::size_t i = outer_indexes[j]; i < outer_indexes[j + 1]; ++i) {
+                        result[inner_indexes[i]] += values[i] * v[j];
+                    }
+                }
+            }
+        }
+
+        return result;
+
+    }
+
 
         /**
          * @brief operator* overloading for performing the multiplication between two matrices (general case)
@@ -367,7 +408,19 @@ namespace algebra{
          * @return result of the multiplication (it is of type MatrixClass)
          */
         template<StorageOrder S1>
-        MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs);
+        MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs){
+    
+    MatrixClass<T,StorageOrder::row_wise> result(_rows,lhs.get_cols());
+    for(std::size_t i=0;i<get_rows();++i){
+        for(std::size_t j=0;j<lhs.get_cols();++j){
+            for(std::size_t k=0;k<lhs.get_rows();++k){
+                result(i,j)+=((*this)(i,k))*(lhs(k,j));
+            }
+        }
+    }
+    return result;
+    }
+
         
 
         /**
