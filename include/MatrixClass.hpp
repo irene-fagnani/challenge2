@@ -76,7 +76,22 @@ namespace algebra{
 
     public:
 
-        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
+    /**
+     * @brief operator< overloading for column-major ordering in the case of column wise order
+     * @param first array of indexes to compare
+     * @param second array of indexes to compare with the first
+     * @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
+    */
+    bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2){
+         if constexpr (S == StorageOrder::column_wise) {
+
+            return (index1[0] < index2[0] || index1[0] == index2[0] && index1[1] < index2[1]);
+
+        }
+        return (index1[1] < index2[1] || index1[1] == index2[1] && index1[0] < index2[0]);
+
+    }
+
 
         /**
          * @brief constructor for the Matrix class
@@ -440,20 +455,52 @@ namespace algebra{
          * @return double result of the norm computation
          */
         template<NormMethod N>
-        decltype(auto) compute_norm()const;
+        decltype(auto) compute_norm()const{
+
+        decltype(auto) norm=0.0;
+
+        if constexpr(N==NormMethod::infinity_norm){
+            decltype(auto) sum=0.0;
+                for(std::size_t i=0;i<_rows;++i){
+                    sum=0;
+                    for(std::size_t j=0;j<_cols;++j) {
+                        sum += std::abs((*this)(i, j));
+                    }
+                    norm=std::max(norm,sum);
+
+            }
+            return norm;
+        }
+
+        if constexpr(N==NormMethod::one_norm){
+            decltype(auto) sum=0.0;
+                for(std::size_t j=0;j<_cols;++j){
+                    sum=0;
+                    for(std::size_t i=0;i<_rows;++i){
+                        sum+=std::abs((*this)(i,j));
+                    }
+                    norm=std::max(norm,sum);
+                }
+
+            return norm;
+        }
+
+        if constexpr(N==NormMethod::Frobenius_norm){
+            if(!compressed){
+                for(const auto & elem: _data){
+                    norm += std::abs(elem.second)*std::abs(elem.second);
+                }
+            }else{
+                for(std::size_t i=0;i<values.size();++i){
+                    norm += std::abs(values[i])*std::abs(values[i]);
+                }
+            }
+            return std::sqrt(norm);
+        }
+
+    }
 
     };
-
-
-
-    /**
-     * @brief operator< overloading for column-major ordering in the case of column wise order
-     * @param first array of indexes to compare
-     * @param second array of indexes to compare with the first
-     * @return true if the index1 position is before index2 position in the Matrix, according to the storage order decided, zero otherwise
-    */
-    bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
-
 
 
 
