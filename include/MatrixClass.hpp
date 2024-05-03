@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <sstream>
 namespace algebra{
-    /**
+    /*!
      * @brief enumerator that indicates the storage ordering
      * @param row_wise indicates the storage ordering by rows
      * @param column_wise indicates the sorage ordering by columns
@@ -20,7 +20,7 @@ namespace algebra{
     };
     
 
-    /**
+    /*!
      * @brief enumerator that indicates the norm method
      * @param one_norm indicates the one norm
      * @param infinity_norm indicates the infinity norm
@@ -32,20 +32,20 @@ namespace algebra{
         Frobenius_norm
     };
     
-    /**
+    /*!
      * @brief primary template
      * @tparam T value type
      */
     template<typename T>
     struct is_complex : std::false_type {};
-    /**
+    /*!
      * @brief patrial specialization for complex numbers
      * @tparam T value type
      */
     template<typename T>
     struct is_complex<std::complex<T>> : std::true_type {};
 
-    /**
+    /*!
      * @brief dynamic matrix class template
      * @tparam T type of the elements in the matrix
      * @tparam S storage order of the matrix
@@ -55,19 +55,19 @@ namespace algebra{
 
     private:
 
-        std::size_t _rows;  /**< Number of rows. */
-        std::size_t _cols;  /**< Number of columns. */
-        std::size_t _nnz=0;  /**< Number of non zero elements in the matrix. */
+        std::size_t _rows;  /*!< Number of rows. */
+        std::size_t _cols;  /*!< Number of columns. */
+        std::size_t _nnz=0;  /*!< Number of non zero elements in the matrix. */
 
-        std::map<std::array<std::size_t,2>,T> _data;  /**< Uncompressed form. Map that store as values non zero elements, as key the vector that stores the correspondents indexes in the matrix */
+        std::map<std::array<std::size_t,2>,T> _data;  /*!< Uncompressed form. Map that store as values non zero elements, as key the vector that stores the correspondents indexes in the matrix */
 
-        bool compressed;  /**< True if the is stored in compressed form, false otherwise */
+        bool compressed;  /*!< True if the is stored in compressed form, false otherwise */
 
-        std::vector<T> values;  /**< Compressed form. Vector that stores the non zero elements.*/
-        std::vector<std::size_t> inner_indexes; /**< Compressed form. Vector that stores inner indexes. */
-        std::vector<std::size_t> outer_indexes; /**< Compressed form. Vector that stores outer indexes. */
+        std::vector<T> values;  /*!< Compressed form. Vector that stores the non zero elements.*/
+        std::vector<std::size_t> inner_indexes; /*!< Compressed form. Vector that stores inner indexes. */
+        std::vector<std::size_t> outer_indexes; /*!< Compressed form. Vector that stores outer indexes. */
 
-        /**
+        /*!
          * @brief check if the indexes provided are inside the dimension of the matrix or not
          * @param row index
          * @param column index
@@ -77,7 +77,7 @@ namespace algebra{
             return r < _rows && c < _cols;
         }
 
-        /**
+        /*!
          * @brief compute the number of non-zero elements
         */
         void compute_nzero(){
@@ -92,7 +92,7 @@ namespace algebra{
 
        friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
 
-        /**
+        /*!
          * @brief constructor for the Matrix class
          * @param number of total columns
          * @param number of total rows
@@ -102,7 +102,7 @@ namespace algebra{
             compute_nzero();
             resize_matrix(rows,cols);}
 
-        /**
+        /*!
          * @brief return _rows
          * @return number of rows
         */
@@ -110,7 +110,7 @@ namespace algebra{
             return _rows;
         }
 
-        /**
+        /*!
          * @brief return _cols
          * @return number of columns
         */
@@ -118,7 +118,7 @@ namespace algebra{
             return _cols;
         }
 
-        /**
+        /*!
          * @brief non const call operator
          * @param row index
          * @param column index
@@ -158,7 +158,7 @@ namespace algebra{
 
         }
 
-        /**
+        /*!
          * @brief const call operator
          * @param row index
          * @param column index
@@ -208,7 +208,7 @@ namespace algebra{
 
         }
 
-        /**
+        /*!
          * @brief perform the compression, according the storage order defined at compile time
         */
         void compress(){
@@ -257,7 +257,7 @@ namespace algebra{
         }
         }
 
-        /**
+        /*!
          * @brief perform the decompression, according the storage order defined at compile time
         */
         void uncompress(){
@@ -287,7 +287,7 @@ namespace algebra{
         values.clear();
         }
 
-        /**
+        /*!
          * @brief allows to know if the matrix is compressed or not
          * @return compressed private member of the class
         */
@@ -295,7 +295,7 @@ namespace algebra{
             return compressed;
         }
         
-        /**
+        /*!
          * @brief set the compressed private member of the class equal to the value parameter
          * @param value new value for the compressed private and bool variable
          */
@@ -303,7 +303,7 @@ namespace algebra{
             compressed=value;
         }
 
-        /**
+        /*!
          * @brief resize a given matrix, given the numbers of column and rows
         */
         void resize_matrix(std::size_t rows, std::size_t cols){
@@ -316,7 +316,7 @@ namespace algebra{
             }
         }
 
-        /**
+        /*!
          * @brief given the name of the mtx file, the function write its content in a MatrixClass object
          * @param name of the mtx file
          * @return MatrixClass object
@@ -367,7 +367,7 @@ namespace algebra{
         file.close();
     }
 
-        /**
+        /*!
          * @brief operator* overloading for performing the multiplication between a matrix A and a vector v, A*v
          * @param vector that will be multiplicated with the matrix
          * @return result of the multiplication
@@ -416,7 +416,7 @@ namespace algebra{
     }
 
 
-        /**
+        /*!
          * @brief operator* overloading for performing the multiplication between two objects of type MatrixClass (general case)
          * @param matrix that will be multiplicted with this
          * @return result of the multiplication (it is of type MatrixClass and of StorageOrder::row_wise)
@@ -474,7 +474,7 @@ namespace algebra{
 
         
 
-        /**
+        /*!
          * @brief this function print an object of type MatrixClass
         */
         void print_matrix()const{
@@ -490,7 +490,7 @@ namespace algebra{
             std::cout << std::endl;
         }
         }
-        /**
+        /*!
          * @brief compute the norm of the matrix, according to the specified norm method
          * @tparam N NormMethod specified the wanted norm method computation
          * @return double result of the norm computation
@@ -543,7 +543,7 @@ namespace algebra{
 
     };
 
-    /**
+    /*!
      * @brief operator< overloading for column-major ordering in the case of column wise order
      * @param first array of indexes to compare
      * @param second array of indexes to compare with the first
