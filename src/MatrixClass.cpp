@@ -2,23 +2,6 @@
 
 namespace algebra {
 
-
-    template<typename T, StorageOrder S>
-    bool MatrixClass<T, S>::is_compressed() const {
-        return compressed;
-    }
-
-    template<typename T, StorageOrder S>
-    void MatrixClass<T, S>::resize_matrix(std::size_t rows, std::size_t cols) {
-        if (!is_compressed()) {
-            for (std::size_t i = 0; i < rows; ++i) {
-                for (std::size_t j = 0; j < cols; ++j) {
-                    _data[{i, j}] = 0;
-                }
-            }
-        }
-    }
-
     template<typename T, StorageOrder S>
     bool operator<(const std::array<std::size_t, 2> &index1, const std::array<std::size_t, 2> &index2) {
 

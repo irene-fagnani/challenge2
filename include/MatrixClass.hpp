@@ -246,14 +246,45 @@ namespace algebra{
         /**
          * @brief perform the decompression, according the storage order defined at compile time
         */
-        void uncompress();
+        void uncompress(){
+             compute_nzero();
+        if (!is_compressed()) {
+            std::cout << "The matrix has not been compressed yet." << std::endl;
+            return;
+        } else {
+            if constexpr (S == StorageOrder::row_wise) {
+                for (std::size_t i = 0; i < _rows; ++i) {
+                    for (std::size_t j = inner_indexes[i]; j < inner_indexes[i + 1]; j++) {
+                        _data[{i, outer_indexes[j]}] = values[j];
+                    }
+                }
+
+            } else if constexpr (S == StorageOrder::column_wise) {
+                for (std::size_t i = 0; i < _cols; ++i) {
+                    for (std::size_t j = outer_indexes[i]; j < outer_indexes[i + 1]; j++) {
+                        _data[{i,inner_indexes[j]}] = values[j];
+                    }
+                }
+            }
+        }
+        set_compressed(false);
+        inner_indexes.clear();
+        outer_indexes.clear();
+        values.clear();
+        }
 
         /**
          * @brief allows to know if the matrix is compressed or not
          * @return compressed private member of the class
         */
-        bool is_compressed() const;
-
+        bool is_compressed() const{
+            return compressed;
+        }
+        
+        /**
+         * @brief set the compressed private member of the class equal to the value parameter
+         * @param value new value for the compressed private and bool variable
+         */
         void set_compressed(bool value){
             compressed=value;
         }
@@ -261,14 +292,66 @@ namespace algebra{
         /**
          * @brief resize a given matrix, given the numbers of column and rows
         */
-        void resize_matrix(std::size_t rows, std::size_t cols);
+        void resize_matrix(std::size_t rows, std::size_t cols){
+            if (!is_compressed()) {
+            for (std::size_t i = 0; i < rows; ++i) {
+                for (std::size_t j = 0; j < cols; ++j) {
+                    _data[{i, j}] = 0;
+                }
+            }
+            }
+        }
 
         /**
          * @brief given the name of the mtx file, the function write its content in a MatrixClass object
          * @param name of the mtx file
          * @return MatrixClass object
         */
-        void read_matrix(const std::string & filename);
+        void read_matrix(const std::string & filename){
+        std::ifstream file(filename);
+
+        if (!file.is_open()) {
+            std::cerr << "Cannot open the file." << std::endl;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            if (line[0] == '%') {
+                continue;
+            }
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+
+            while (ss >> token) {
+                tokens.push_back(token);
+            }
+
+            if (tokens.size() != 3) {
+                std::cerr << "The matrix file is not in the correct format." << std::endl;
+            }
+
+            if (tokens[0] == "%%MatrixMarket") {
+                if (tokens[1] != "matrix" || tokens[2] != "real" || tokens[2] != "integer") {
+                    std::cerr << "Only general, real, matrices are supported. " << std::endl;
+                }
+            } else {
+                _rows = std::stoi(tokens[0]);
+                _cols = std::stoi(tokens[1]);
+                _nnz = std::stoi(tokens[2]);
+
+                for (int i = 0; i < _nnz; ++i) {
+                    std::getline(file, line);
+                    std::stringstream ss2(line);
+                    int row, col;
+                    T value;
+                    ss2 >> row >> col >> value;
+                    _data[{row - 1, col - 1}] = value;
+                }
+            }
+        }
+        file.close();
+    }
 
         /**
          * @brief operator* overloading for performing the multiplication between a matrix A and a vector v, A*v
