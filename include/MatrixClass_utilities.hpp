@@ -1,6 +1,8 @@
 #include <complex>
 #include <iostream>
 #include <array>
+
+
 #ifndef MATRIXCLASS_UTILITIES_HPP
 #define MATRIXCLASS_UTILITIES_HPP
 namespace algebra{
