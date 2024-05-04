@@ -8,8 +8,9 @@ namespace algebra{
      T & MatrixClass<T,S>::operator()(const std::size_t i,const std::size_t j){
             if (!in_bound(i, j)) {
             std::cerr << "Index out of bounds." << std::endl;
-        }
-        if (!is_compressed()) {
+            exit(1);
+            }
+             if (!is_compressed()) {
             if constexpr (S == StorageOrder::row_wise) {
                 return _data[{i, j}];
             }
@@ -18,13 +19,13 @@ namespace algebra{
                 return _data[{j, i}];
             }
 
-        } else {
-            if constexpr (S == StorageOrder::row_wise) {
-                for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
-                    if (outer_indexes[ii] == j) {
-                        return values[ii];
+            } else {
+               if constexpr (S == StorageOrder::row_wise) {
+                   for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
+                       if (outer_indexes[ii] == j) {
+                          return values[ii];
+                        }
                     }
-                }
             } else if constexpr (S == StorageOrder::column_wise) {
                 for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
                     if (inner_indexes[jj] == i) {
@@ -33,9 +34,10 @@ namespace algebra{
 
                 }
             }
-        }
-        std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
-        }
+            }
+            std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
+            exit(1);
+            }
 
     template<typename T, StorageOrder S>
     T MatrixClass<T,S>::operator()(const std::size_t i, const std::size_t j)const{
@@ -212,10 +214,10 @@ namespace algebra{
                 }
                 _nnz = std::stoi(tokens[2]);
 
-                for (int i = 0; i < _nnz; ++i) {
+                for (std::size_t i = 0; i < _nnz; ++i) {
                     std::getline(file, line);
                     std::stringstream ss2(line);
-                    int row, col;
+                    std::size_t row, col;
                     T value;
                     if constexpr(S==StorageOrder::row_wise){
                     ss2 >> row >> col >> value;

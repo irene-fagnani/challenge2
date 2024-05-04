@@ -64,7 +64,7 @@ int main(){
     B1.compress();
     std::cout<<"\nB1*v2\n"<<std::endl;
 
-    B1.print_matrix();
+    //B1.print_matrix();
 
     std::vector<double> v2(B1.get_cols(),1);
 
@@ -95,7 +95,7 @@ int main(){
     B2.compress();
     std::cout<<"\nB2*v2\n"<<std::endl;
 
-   B2.print_matrix();
+    //B2.print_matrix();
     auto t0_3 = std::chrono::high_resolution_clock::now();
 
     std::vector<double> res4 = B2*v2;
