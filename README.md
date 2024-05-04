@@ -35,12 +35,12 @@ In large scale computations it is often necessary to exploit sparsity to be able
 + [lnsp_131.mtx](https://github.com/irene-fagnani/challenge2/blob/main/lnsp_131.mtx): matrix used in the main.cpp
 
 
-Content of [MatrixClass.hpp](https://github.com/irene-fagnani/challenge2/blob/main/MatrixClass.hpp)
+Content of [MatrixClass.hpp](https://github.com/irene-fagnani/challenge2/blob/main/include/MatrixClass.hpp)
 
 + Template class and declarations of all members of the class, in the algebra namespace.
 
 
-Content of  [MatrixClass_implementations.hpp](https://github.com/irene-fagnani/challenge2/blob/main/MatrixClass_implementations.hpp)
+Content of  [MatrixClass_implementations.hpp](https://github.com/irene-fagnani/challenge2/blob/main/include/MatrixClass_implementations.hpp)
 
 + Definition of all the member function of the MatrixClass template class:
     - Const and non-const operator().
@@ -52,17 +52,17 @@ Content of  [MatrixClass_implementations.hpp](https://github.com/irene-fagnani/c
     - A method to print the matrix.
 
 
-Content of [MatrixClass_Utilities.hpp](https://github.com/irene-fagnani/challenge2/blob/main/MatrixClass_Utilities.hpp)
+Content of [MatrixClass_utilities.hpp](https://github.com/irene-fagnani/challenge2/blob/main/include/MatrixClass_utilities.hpp)
 
 + Enums `StorageOrder` and `NormMethod`, used to specify the order of storage of elements in a MatrixClass object (row wisely or column wisely) and to specify the wanted method to compute the norm.
 + The friend function operator<, used to confront the key of the map in the two different cases (column wise or row wise storage)
 + Structs to verify is a number is complex or not.
 
-Content of [Utilities.hpp](https://github.com/irene-fagnani/challenge2/blob/main/Utilities.hpp)
+Content of [Utilities.hpp](https://github.com/irene-fagnani/challenge2/blob/main/include/Utilities.hpp)
 + A function to print vectors
 + Two functions to count the time of the multiplication, thanks to the `chrono` library. Thanks to the overloading, the porogram is capable to deal with different input types parameters (vectors or MatrixClass).
 
-Content of [main.cpp](https://github.com/irene-fagnani/challenge2/blob/main/main.cpp)
+Content of [main.cpp](https://github.com/irene-fagnani/challenge2/blob/main/src/main.cpp)
 + It contains the main function. The case with "lnsp_131.mtx" matrix is setted as default. For each case, uncompressed and compressed, a set of operations are done: matrix * vector, matrix * vector, with vector as an MatrixClass object, and matrix * matrix. Also, all 3 types of norms are computed. The part with the smallest matrix is ​​commented because I believe the decrease in multiplication time going from the uncompressed case to the compressed one is not notable. However, in this part I show also how the methods of the class works also with `std::complex` types.
 
 ### Requirements
