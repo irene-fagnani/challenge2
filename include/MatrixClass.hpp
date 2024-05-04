@@ -11,7 +11,7 @@
 #ifndef MATRIXCLASS_HPP
 #define MATRIXCLASS_HPP
 
-namespace algebra{    
+namespace algebra{
     /*!
      * @brief dynamic matrix class template
      * @tparam T type of the elements in the matrix
@@ -38,16 +38,16 @@ namespace algebra{
     public:
 
         friend bool operator<(const std::array<std::size_t,2> & index1, const std::array<std::size_t,2> & index2);
-       
+
         /*!
          * @brief constructor for the Matrix class
          * @param number of total columns
          * @param number of total rows
          * @param boolean variable to know if the matrix has been already compressed or not (set to false if not provided)
         */
-        MatrixClass(std::size_t rows=0, std::size_t cols = 0) : _rows(rows), _cols(cols), compressed(false) {
+        MatrixClass(std::size_t rows=0, std::size_t cols = 0, T value=0) : _rows(rows), _cols(cols), compressed(false) {
             compute_nzero();
-            resize_matrix(rows,cols);}
+            resize_matrix(rows,cols,value);}
         /*!
          * @brief check if the indexes provided are inside the dimension of the matrix or not
          * @param row index
@@ -63,10 +63,10 @@ namespace algebra{
         */
         void compute_nzero(){
             for (auto it = _data.begin(); it != _data.end(); it++) {
-            if (it->second != T{}) {
-                _nnz++;
+                if (it->second != T{}) {
+                    _nnz++;
+                }
             }
-        }
         }
 
         /*!
@@ -92,7 +92,7 @@ namespace algebra{
          * @param value to add in the matrix in (i,j) position
         */
         T & operator()(const std::size_t i,const std::size_t j);
-        
+
         /*!
          * @brief const call operator
          * @param row index
@@ -118,7 +118,7 @@ namespace algebra{
         bool is_compressed() const{
             return compressed;
         }
-        
+
         /*!
          * @brief set the compressed private member of the class equal to the value parameter
          * @param value new value for the compressed private and bool variable
@@ -130,7 +130,7 @@ namespace algebra{
         /*!
          * @brief resize a given matrix, given the numbers of column and rows (only if the matrix is uncompress)
         */
-        void resize_matrix(std::size_t rows, std::size_t cols);
+        void resize_matrix(std::size_t rows, std::size_t cols, T val);
 
         /*!
          * @brief given the name of the mtx file, the function write its content in a MatrixClass object
@@ -144,29 +144,31 @@ namespace algebra{
          * @param vector that will be multiplicated with the matrix
          * @return result of the multiplication
         */
-        std::vector<T> operator*(const std::vector<T> & v);
+
+        template<typename Tv>
+        std::vector<decltype(T{} * Tv{})> operator*(const std::vector<Tv> & v);
 
         /*!
          * @brief operator* overloading for performing the multiplication between two objects of type MatrixClass (general case)
          * @param matrix that will be multiplicted with this
          * @return result of the multiplication (it is of type MatrixClass and of StorageOrder::row_wise)
          */
-        template<StorageOrder S1>
-        MatrixClass<T,StorageOrder::row_wise> operator*(MatrixClass<T,S1> const & lhs);
-    
+        template<typename T2,StorageOrder S2>
+        MatrixClass<decltype(T{} * T2{}),StorageOrder::row_wise> operator*(MatrixClass<T2,S2> const & lhs);
+
         /*!
          * @brief compute the norm of the matrix, according to the specified norm method
          * @tparam N NormMethod specified the wanted norm method computation
          * @return double result of the norm computation
          */
-      
-     template<NormMethod N>
-     decltype(auto) compute_norm()const;
-    /*!
-    * @brief this function print an object of type MatrixClass
-    */
 
-    void print_matrix()const;
+        template<NormMethod N>
+        decltype(auto) compute_norm()const;
+        /*!
+        * @brief this function print an object of type MatrixClass
+        */
+
+        void print_matrix()const;
     };
 
 };

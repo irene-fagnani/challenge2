@@ -5,12 +5,12 @@
 namespace algebra{
 
     template<typename T, StorageOrder S>
-     T & MatrixClass<T,S>::operator()(const std::size_t i,const std::size_t j){
-            if (!in_bound(i, j)) {
+    T & MatrixClass<T,S>::operator()(const std::size_t i,const std::size_t j){
+        if (!in_bound(i, j)) {
             std::cerr << "Index out of bounds." << std::endl;
             exit(1);
-            }
-             if (!is_compressed()) {
+        }
+        if (!is_compressed()) {
             if constexpr (S == StorageOrder::row_wise) {
                 return _data[{i, j}];
             }
@@ -19,13 +19,13 @@ namespace algebra{
                 return _data[{j, i}];
             }
 
-            } else {
-               if constexpr (S == StorageOrder::row_wise) {
-                   for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
-                       if (outer_indexes[ii] == j) {
-                          return values[ii];
-                        }
+        } else {
+            if constexpr (S == StorageOrder::row_wise) {
+                for (std::size_t ii = inner_indexes[i]; ii < inner_indexes[i + 1]; ++ii) {
+                    if (outer_indexes[ii] == j) {
+                        return values[ii];
                     }
+                }
             } else if constexpr (S == StorageOrder::column_wise) {
                 for (std::size_t jj = outer_indexes[j]; jj < outer_indexes[j + 1]; ++jj) {
                     if (inner_indexes[jj] == i) {
@@ -34,14 +34,14 @@ namespace algebra{
 
                 }
             }
-            }
-            std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
-            exit(1);
-            }
+        }
+        std::cerr<<"In the case of compressed matrix can only change the value of existing non-zero elements.\n"<<std::endl;
+        exit(1);
+    }
 
     template<typename T, StorageOrder S>
     T MatrixClass<T,S>::operator()(const std::size_t i, const std::size_t j)const{
-          if (!in_bound(i, j)) {
+        if (!in_bound(i, j)) {
             std::cerr << "Index out of bounds." << std::endl;
         }
         if (!is_compressed()) {
@@ -86,7 +86,7 @@ namespace algebra{
 
     template<typename T, StorageOrder S>
     void MatrixClass<T,S>::compress(){
-             if (is_compressed()) {
+        if (is_compressed()) {
             std::cout
                     << "The matrix has already been compressed. If you want to compress it again, please decompress it first."
                     << std::endl;
@@ -134,7 +134,7 @@ namespace algebra{
 
     template<typename T, StorageOrder S>
     void MatrixClass<T,S>::uncompress(){
-         compute_nzero();
+        compute_nzero();
         if (!is_compressed()) {
             std::cout << "The matrix has already been uncompressed. If you want to uncompress it again, please compress it first." << std::endl;
             return;
@@ -161,23 +161,23 @@ namespace algebra{
     }
 
     template<typename T, StorageOrder S>
-    void MatrixClass<T,S>::resize_matrix(std::size_t rows, std::size_t cols){
+    void MatrixClass<T,S>::resize_matrix(std::size_t rows, std::size_t cols, T val){
         if (!is_compressed()) {
             for (std::size_t i = 0; i < rows; ++i) {
                 for (std::size_t j = 0; j < cols; ++j) {
                     if constexpr(S==StorageOrder::row_wise){
-                    _data[{i, j}] = 0;
+                        _data[{i, j}] = val;
                     }else if constexpr(S==StorageOrder::column_wise){
-                        _data[{j,i}]=0;
+                        _data[{j,i}]=val;
                     }
-               }
+                }
             }
         }
     }
 
     template<typename T, StorageOrder S>
     void MatrixClass<T,S>::read_matrix(const std::string & filename){
-         std::ifstream file(filename);
+        std::ifstream file(filename);
 
         if (!file.is_open()) {
             std::cerr << "Cannot open the file." << std::endl;
@@ -206,11 +206,11 @@ namespace algebra{
                 }
             } else {
                 if constexpr(S==StorageOrder::row_wise){
-                _rows = std::stoi(tokens[0]);
-                _cols = std::stoi(tokens[1]);
+                    _rows = std::stoi(tokens[0]);
+                    _cols = std::stoi(tokens[1]);
                 }else if constexpr(S==StorageOrder::column_wise){
-                _cols = std::stoi(tokens[0]);
-                _rows = std::stoi(tokens[1]);  
+                    _cols = std::stoi(tokens[0]);
+                    _rows = std::stoi(tokens[1]);
                 }
                 _nnz = std::stoi(tokens[2]);
 
@@ -220,7 +220,7 @@ namespace algebra{
                     std::size_t row, col;
                     T value;
                     if constexpr(S==StorageOrder::row_wise){
-                    ss2 >> row >> col >> value;
+                        ss2 >> row >> col >> value;
                     }else if constexpr(S==StorageOrder::column_wise){
                         ss2>>col>>row>>value;
                     }
@@ -233,12 +233,14 @@ namespace algebra{
 
 
     template<typename T, StorageOrder S>
-    std::vector<T> MatrixClass<T,S>::operator*(const std::vector<T> & v){
-         if (v.size() != _cols) {
+    template<typename Tv>
+    std::vector<decltype(T{} * Tv{})> MatrixClass<T,S>::operator*(const std::vector<Tv> & v){
+
+        if (v.size() != _cols) {
             std::cerr << "The vector size does not match the matrix column size." << std::endl;
         }
 
-        std::vector<T> result(_rows,T{});
+        std::vector<decltype(T{} * Tv{})> result(_rows, decltype(T{} * Tv{}){});
         if constexpr (S == StorageOrder::row_wise) {
             if (!compressed) {
                 for (std::size_t i = 0; i < _rows; ++i) {
@@ -256,9 +258,9 @@ namespace algebra{
         } else if (S == StorageOrder::column_wise) {
 
             if (!compressed){
-                    for (std::size_t j = 0; j < _cols; ++j) {
-                        for(auto it=_data.lower_bound({j,0});it!=_data.upper_bound({j,_rows-1});++it){
-                            result[it->first[1]]+=(it->second)*v[j];
+                for (std::size_t j = 0; j < _cols; ++j) {
+                    for(auto it=_data.lower_bound({j,0});it!=_data.upper_bound({j,_rows-1});++it){
+                        result[it->first[1]]+=(it->second)*v[j];
                     }
                 }
             } else {
@@ -273,15 +275,15 @@ namespace algebra{
         return result;
     }
 
-       template<typename T, StorageOrder S1>
-       template<StorageOrder S2>
-        MatrixClass<T,StorageOrder::row_wise> MatrixClass<T,S1>::operator*(MatrixClass<T,S2> const & lhs){
-            if(_cols!=lhs.get_rows()){
-                std::cerr<<"The number of columns of the first matrix must be equal to the number of rows of the second matrix."<<std::endl;
-            }
-    
-        MatrixClass<T,StorageOrder::row_wise> result(_rows,lhs.get_cols());
-        if constexpr (S1 == StorageOrder::row_wise) {
+    template<typename T, StorageOrder S>
+    template<typename T2, StorageOrder S2>
+    MatrixClass<decltype(T{} * T2{}),StorageOrder::row_wise> MatrixClass<T,S>::operator*(MatrixClass<T2,S2> const & lhs){
+        if(_cols!=lhs.get_rows()){
+            std::cerr<<"The number of columns of the first matrix must be equal to the number of rows of the second matrix."<<std::endl;
+        }
+
+        MatrixClass<decltype(T{} * T2{}),StorageOrder::row_wise> result(_rows,lhs.get_cols());
+        if constexpr (S == StorageOrder::row_wise) {
             if (!compressed) {
                 for(std::size_t k=0;k<lhs.get_cols();++k){
                     for (std::size_t i = 0; i < _rows; ++i) {
@@ -299,7 +301,7 @@ namespace algebra{
                     }
                 }
             }
-        } else if (S1 == StorageOrder::column_wise) {
+        } else if (S == StorageOrder::column_wise) {
             if (!compressed){
                 for(std::size_t k=0;k<lhs.get_cols();++k){
                     for (std::size_t j = 0; j < _cols; ++j) {
@@ -319,23 +321,23 @@ namespace algebra{
             }
         }
 
-    
-    return result;
+
+        return result;
     }
 
 
-     template<typename T, StorageOrder S>
-     template<NormMethod N>
-     decltype(auto) MatrixClass<T,S>::compute_norm()const{
-      decltype(auto) norm=0.0;
+    template<typename T, StorageOrder S>
+    template<NormMethod N>
+    decltype(auto) MatrixClass<T,S>::compute_norm()const{
+        decltype(auto) norm=0.0;
         if constexpr(N==NormMethod::infinity_norm){
             decltype(auto) sum=0.0;
-                for(std::size_t i=0;i<_rows;++i){
-                    sum=0.0;
-                    for(std::size_t j=0;j<_cols;++j) {
-                        sum += std::abs((*this)(i, j));
-                    }
-                    norm=std::max(norm,sum);
+            for(std::size_t i=0;i<_rows;++i){
+                sum=0.0;
+                for(std::size_t j=0;j<_cols;++j) {
+                    sum += std::abs((*this)(i, j));
+                }
+                norm=std::max(norm,sum);
 
             }
             return norm;
@@ -343,23 +345,23 @@ namespace algebra{
 
         if constexpr(N==NormMethod::one_norm){
             decltype(auto) sum=0.0;
-                for(std::size_t j=0;j<_cols;++j){
-                    sum=0.0;
-                    for(std::size_t i=0;i<_rows;++i){
-                        sum+=std::abs((*this)(i,j));
-                    }
-                    norm=std::max(norm,sum);
+            for(std::size_t j=0;j<_cols;++j){
+                sum=0.0;
+                for(std::size_t i=0;i<_rows;++i){
+                    sum+=std::abs((*this)(i,j));
                 }
+                norm=std::max(norm,sum);
+            }
 
             return norm;
         }
 
         if constexpr(N==NormMethod::Frobenius_norm){
-                for(std::size_t i=0;i<_rows;++i){
-                    for(std::size_t j=0;j<_cols;++j){
-                        norm+=std::abs((*this)(i,j))*std::abs((*this)(i,j));
-                    }
+            for(std::size_t i=0;i<_rows;++i){
+                for(std::size_t j=0;j<_cols;++j){
+                    norm+=std::abs((*this)(i,j))*std::abs((*this)(i,j));
                 }
+            }
             return std::sqrt(norm);
         }
 
@@ -374,7 +376,7 @@ namespace algebra{
                 }else{
                     std::cout << (*this)(i, j) << " ";
                 }
-                
+
             }
             std::cout << std::endl;
         }

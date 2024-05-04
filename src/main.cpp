@@ -1,162 +1,241 @@
 
 #include "MatrixClass_implementations.hpp"
-#include <chrono>
-
-int main(){
-
-    algebra::MatrixClass<std::complex<double>,algebra::StorageOrder::row_wise> A_row(3,3);
-
-    A_row(0,0)=1;
-    A_row(0,1)=2;
-    A_row(0,2)=3;
-    A_row(1,0)=4;
-    A_row(1,1)=5;
-    A_row(1,2)=6;
-    A_row(2,0)=7;
-    A_row(2,1)=8;
-    A_row(2,2)=9;
-
-    algebra::MatrixClass<std::complex<double>,algebra::StorageOrder::column_wise> A_col(3,3);
-
-    A_col(0,0)=1;
-    A_col(0,1)=2;
-    A_col(0,2)=3;
-    A_col(1,0)=4;
-    A_col(1,1)=5;
-    A_col(1,2)=6;
-    A_col(2,0)=7;
-    A_col(2,1)=8;
-    A_col(2,2)=9;
-
-    std::cout<<"---ROW_WISE---"<<std::endl;
-    std::cout<<"one_norm: "<<A_row.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
-    std::cout<<"infinity_norm: "<<A_row.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
-    std::cout<<"frobenius_norm: "<<A_row.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
-
-    std::cout<<"---COL_WISE---"<<std::endl;
-    std::cout<<"one_norm: "<<A_col.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
-    std::cout<<"infinity_norm: "<<A_col.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
-    std::cout<<"frobenius_norm: "<<A_col.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
-
-    std::vector<std::complex<double>> v = {1,2,3};
-
-   // A.compress();
-   // A.print_matrix();
-
-    std::cout<<"A*v\n"<<std::endl;
+#include "Utilities.hpp"
+#include "GetPot"
 
 
+int main(int argc, char **argv){
+  GetPot command_line(argc,argv);
+  std::string filename=command_line("filename","lnsp_131.mtx");
+  bool print=command_line("print",false);
 
-    auto t0 = std::chrono::high_resolution_clock::now();
+  std::cout<<"\nBIG MATRIX CASE: ---------------------------------------------------------\n"<<std::endl;
 
-   // std::vector<std::complex<double>> res = A*v;
 
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto delta_t = std::chrono::duration_cast<std::chrono::microseconds>(t1-t0);
-  //  std::cout << ((A.is_compressed())?"compressed":"uncompressed") << " : " << delta_t.count() << " ms" << std::endl;
+  algebra::MatrixClass<double,algebra::StorageOrder::row_wise> B_row;
+  B_row.read_matrix(filename);
+
+  algebra::MatrixClass<double,algebra::StorageOrder::column_wise> B_col;
+  B_col.read_matrix(filename);
+
+  //B_row.print_matrix();
+  //B_col.print_matrix();
+
+  std::cout<<"\nNorm computations: B_row\n "<<std::endl;
+  std::cout<<"one_norm:       "<<B_row.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
+  std::cout<<"infinity_norm:  "<<B_row.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
+  std::cout<<"frobenius_norm: "<<B_row.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
+
+  std::cout<<"\nNorm computations: B_col\n "<<std::endl;
+  std::cout<<"one_norm:       "<<B_col.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
+  std::cout<<"infinity_norm:  "<<B_col.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
+  std::cout<<"frobenius_norm: "<<B_col.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
+
+  std::vector<double> v_big(B_row.get_cols(),1);
+  algebra::MatrixClass<double,algebra::StorageOrder::row_wise> v_big_m(B_row.get_cols(),1,1);
+
+  std::cout<<"\n\nUncompress: -------------------------------------------------------------------\n"<<std::endl;
+
+  std::cout<<"\nProducts: matrix * vector\n\n"<<std::endl;
+
+  std::cout<<"\n B_row * v_big:\n\n"<<std::endl;
+
+  auto delta_U_1=time_test(B_row,v_big,print);
+
+  std::cout<<"\n B_col * v_big:\n\n"<<std::endl;
+
+  auto delta_U_2=time_test(B_col,v_big,print);
+
+  std::cout<<"\nProducts: matrix * matrix\n\n"<<std::endl;
+
+  std::cout<<"\n B_row * v_big_m:\n\n"<<std::endl;
+
+  auto delta_U_3=time_test(B_row,v_big_m,print);
+
+  std::cout<<"\n B_col * v_big_m:\n\n"<<std::endl;
+
+  auto delta_U_4=time_test(B_col,v_big_m,print);
+
+  std::cout<<"\n B_col * B_row:\n\n"<<std::endl;
+
+  auto delta_U_5=time_test(B_col,B_row,print);
+
+  std::cout<<"\n\nCompress: -------------------------------------------------------------------\n"<<std::endl;
+
+  B_row.compress();
+  B_col.compress();
+
+  std::cout<<"Products: matrix * vector\n\n"<<std::endl;
+
+  std::cout<<"\n B_row * v_big:\n\n"<<std::endl;
+
+  auto delta_C_1=time_test(B_row,v_big,print);
+
+  std::cout<<"\n B_col * v_big:\n\n"<<std::endl;
+
+  auto delta_C_2=time_test(B_col,v_big,print);
+
+  std::cout<<"\nProducts: matrix * matrix\n\n"<<std::endl;
+
+  std::cout<<"\n B_row * v_big_m:\n\n"<<std::endl;
+
+  auto delta_C_3=time_test(B_row,v_big_m,print);
+
+  std::cout<<"\n B_col * v_big_m:\n\n"<<std::endl;
+
+  auto delta_C_4=time_test(B_col,v_big_m,print);
+
+  std::cout<<"\n B_col * B_row:\n\n"<<std::endl;
+
+  auto delta_C_5=time_test(B_col,B_row,print);
+
+   //std::cout<<"\n\nDecompress: --------------------------------------------------------------\n"<<std::endl;
+   //B_row.uncompress();
+   //B_col.uncompress();
+
+  
+   // std::cout<<"\nB_row: \n"<<std::endl;
+   // B_row.print_matrix();
+   // std::cout<<"\nB_col: \n"<<std::endl;
+   // B_col.print_matrix();
+
+  std::cout<<"\n\nConclusions: ---------------------------------------------------------------\n"<<std::endl;
+
+  std::cout<<"Percentage of time decrease for the matrix-vector product:\n"<<std::endl;
+  std::cout<<"B_row * v_big: "<<(delta_U_1.count()-delta_C_1.count())*100./delta_U_1.count()<<"%\n"<<std::endl;
+  std::cout<<"B_col * v_big: "<<(delta_U_2.count()-delta_C_2.count())*100./delta_U_2.count()<<"%\n"<<std::endl;
+  std::cout<<"Percentage of time decrease for the matrix-matrix product:\n"<<std::endl;
+  std::cout<<"B_row * v_big_m: "<<(delta_U_3.count()-delta_C_3.count())*100./delta_U_3.count()<<"%\n"<<std::endl;
+  std::cout<<"B_col * v_big_m: "<<(delta_U_4.count()-delta_C_4.count())*100./delta_U_4.count()<<"%\n"<<std::endl;
+  std::cout<<"B_col * B_row: "<<(delta_U_5.count()-delta_C_5.count())*100./delta_U_5.count()<<"%\n"<<std::endl;
+  
+  /*
+
+    std::cout<<"SMALL MATRIX CASE: ---------------------------------------------------------\n"<<std::endl;
     
 
+    algebra::MatrixClass<std::complex<double>,algebra::StorageOrder::row_wise> A_row_complex(3,3);
+
+    A_row_complex(0,0).imag(1);
+    A_row_complex(1,1).imag(1);
+    A_row_complex(2,2).imag(1); 
 
 
-    algebra::MatrixClass<double, algebra::StorageOrder::row_wise> B1;
+    algebra::MatrixClass<double,algebra::StorageOrder::column_wise> A_col_real(3,3);
 
-    B1.read_matrix("lnsp_131.mtx");
-    B1.compress();
-    std::cout<<"\nB1*v2\n"<<std::endl;
+    A_col_real(0,0)=1;
+    A_col_real(1,1)=1;
+    A_col_real(2,2)=1;
+    std::cout<<"A_row: complex matrix stored row_wise\n"<<std::endl;
+    A_row_complex.print_matrix();
 
-    //B1.print_matrix();
-
-    std::vector<double> v2(B1.get_cols(),1);
-
-    auto t0_1 = std::chrono::high_resolution_clock::now();
-
-    std::vector<double> res2 = B1*v2;
-
-    auto t1_1 = std::chrono::high_resolution_clock::now();
-    auto delta_t_1 = std::chrono::duration_cast<std::chrono::microseconds>(t1_1-t0_1);
+    std::cout<<"\nNorm computations\n "<<std::endl;
+    std::cout<<"one_norm:       "<< A_row_complex.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
+    std::cout<<"infinity_norm:  "<< A_row_complex.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
+    std::cout<<"frobenius_norm: "<< A_row_complex.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
     
-    std::cout << ((B1.is_compressed())?"compressed":"uncompressed") << " : " << delta_t_1.count() << " ms" << std::endl;
+    std::cout<<"\nA_col: real matrix stored column_wise\n"<<std::endl;
+    A_col_real.print_matrix();
 
-    B1.uncompress();
-
-    auto t0_2 = std::chrono::high_resolution_clock::now();
-
-    std::vector<double> res3 = B1*v2;
-
-    auto t1_2 = std::chrono::high_resolution_clock::now();
-    auto delta_t_2 = std::chrono::duration_cast<std::chrono::microseconds>(t1_2-t0_2);
-    
-    std::cout << ((B1.is_compressed())?"compressed":"uncompressed") << " : " << delta_t_2.count() << " ms" << std::endl;
-
-    
-    
-    algebra::MatrixClass<double,algebra::StorageOrder::column_wise> B2;
-    B2.read_matrix("lnsp_131.mtx");
-    B2.compress();
-    std::cout<<"\nB2*v2\n"<<std::endl;
-
-    //B2.print_matrix();
-    auto t0_3 = std::chrono::high_resolution_clock::now();
-
-    std::vector<double> res4 = B2*v2;
-
-    auto t1_3 = std::chrono::high_resolution_clock::now();
-    auto delta_t_3 = std::chrono::duration_cast<std::chrono::microseconds>(t1_3-t0_3);
-    
-    std::cout << ((B2.is_compressed())?"compressed":"uncompressed") << " : " << delta_t_3.count() << " ms" << std::endl;
-
-   // B2.uncompress();
+    std::cout<<"\nNorm computations\n "<<std::endl;
+    std::cout<<"one_norm:       "<<A_col_real.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
+    std::cout<<"infinity_norm:  "<<A_col_real.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
+    std::cout<<"frobenius_norm: "<<A_col_real.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
 
 
-    auto t0_4 = std::chrono::high_resolution_clock::now();
 
-    std::vector<double> res5 = B2*v2;
+    std::vector<double> v_real = {1,2,3};
+    std::vector<std::complex<double>> v_complex = {{0,1},{0,2},{0,3}};
 
-    auto t1_4 = std::chrono::high_resolution_clock::now();
-    auto delta_t_4 = std::chrono::duration_cast<std::chrono::microseconds>(t1_4-t0_4);
-    
-    std::cout << ((B2.is_compressed())?"compressed":"uncompressed") << " : " << delta_t_4.count() << " ms" << std::endl;
+    algebra::MatrixClass<double,algebra::StorageOrder::row_wise> v_real_m(3,1);
+    v_real_m(0,0)=1;
+    v_real_m(1,0)=2;
+    v_real_m(2,0)=3;
+    algebra::MatrixClass<std::complex<double>,algebra::StorageOrder::column_wise> v_complex_m(3,1);
+    v_complex_m(0,0).imag(1);
+    v_complex_m(1,0).imag(2);
+    v_complex_m(2,0).imag(3);
 
-    std::cout<<"\nB2*B1\n"<<std::endl;
+    std::cout<<"\nv_real: \n"<<std::endl;
+    algebra::print_vector(v_real);
 
-    auto t0_5=std::chrono::high_resolution_clock::now();
+    std::cout<<"\nv_complex: \n"<<std::endl;
+    algebra::print_vector(v_complex);
 
-    algebra::MatrixClass<double,algebra::StorageOrder::row_wise> res6=B2*B1;
+    std::cout<<"\nv_real_m: \n"<<std::endl;
+    v_real_m.print_matrix();
 
-    auto t1_5=std::chrono::high_resolution_clock::now();
-    auto delta_t_5 = std::chrono::duration_cast<std::chrono::microseconds>(t1_5-t0_5);
-
-    std::cout<<((res6.is_compressed())?"compressed":"uncompressed")<<" : "<<delta_t_5.count()<<" ms"<<std::endl;
-
-    std::cout<<B2.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
+    std::cout<<"\nv_complex_m: \n"<<std::endl;
+    v_complex_m.print_matrix();
 
     
+    std::cout<<"\nUncompress: -------------------------------------------------------------------\n"<<std::endl;
 
-    algebra::MatrixClass<double,algebra::StorageOrder::row_wise> B_row;
-    B_row.read_matrix("lnsp_131.mtx");
-    B_row.compress();
-    std::cout<<"---ROW_WISE---"<<std::endl;
-    std::cout<<"one_norm: "<<B_row.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
-    std::cout<<"infinity_norm: "<<B_row.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
-    std::cout<<"frobenius_norm: "<<B_row.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
+    std::cout<<"Products: matrix * vector\n\n"<<std::endl;
 
-    algebra::MatrixClass<double,algebra::StorageOrder::column_wise> B_col;
-    B_col.read_matrix("lnsp_131.mtx");
-    B_col.compress();
-    std::cout<<"---COL_WISE---"<<std::endl;
-    std::cout<<"one_norm: "<<B_col.compute_norm<algebra::NormMethod::one_norm>()<<std::endl;
-    std::cout<<"infinity_norm: "<<B_col.compute_norm<algebra::NormMethod::infinity_norm>()<<std::endl;    
-    std::cout<<"frobenius_norm: "<<B_col.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
-    /*
-    std::cout<<"\n\nCOLUMN WISE MATRIX\n\n"<<std::endl;
-    B_col.print_matrix();
+    std::cout<<"\n A_row_complex * v_real\n"<<std::endl;
 
-    std::cout<<"\n\nROW WISE MATRIX\n\n"<<std::endl;
-    B_row.print_matrix();
-    */
+    time_test(A_row_complex,v_real,print);
+
+    std::cout<<"\n A_col_real * v_complex\n"<<std::endl;
+
+    time_test(A_col_real,v_complex,print);
+
+    std::cout<<"Products: matrix * matrix\n\n"<<std::endl;
+
+    std::cout<<"\n A_row_complex * v_real_m\n"<<std::endl;
+
+    time_test(A_row_complex,v_real_m,print);
+
+    std::cout<<"\n A_col_real * v_complex_m\n"<<std::endl;
+
+    time_test(A_col_real,v_complex_m,print);
+
+    std::cout<<"\n A_col_real * A_row_complex\n"<<std::endl;
+
+    time_test(A_col_real,A_row_complex,print);
+
    
 
+    std::cout<<"\nCompress: -------------------------------------------------------------------\n"<<std::endl;
 
+    A_col_real.compress();
+    A_row_complex.compress();
+
+    std::cout<<"Products: matrix * vector\n\n"<<std::endl;
+
+    std::cout<<"\n A_row_complex * v_real\n"<<std::endl;
+
+    time_test(A_row_complex,v_real,print);
+
+    std::cout<<"\n A_col_real * v_complex\n"<<std::endl;
+
+    time_test(A_col_real,v_complex,print);
+
+    std::cout<<"Products: matrix * matrix\n\n"<<std::endl;
+
+    std::cout<<"\n A_row_complex * v_real_m\n"<<std::endl;
+
+    time_test(A_row_complex,v_real_m,print);
+
+    std::cout<<"\n A_col_real * v_complex_m\n"<<std::endl;
+
+    time_test(A_col_real,v_complex_m,print);
+
+    std::cout<<"\n A_col_real * A_row_complex\n"<<std::endl;
+
+    time_test(A_col_real,A_row_complex,print);
+
+  std::cout<<"\nDecompress: --------------------------------------------------------------\n"<<std::endl;
+   A_col_real.uncompress();
+   A_row_complex.uncompress();
+  
+   std::cout<<"\nA_col_real: \n"<<std::endl;
+   A_col_real.print_matrix();
+   std::cout<<"\nA_row_complex: \n"<<std::endl;
+   A_row_complex.print_matrix();
+    
+    */
 
 
 
