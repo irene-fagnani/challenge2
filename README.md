@@ -93,7 +93,7 @@ Run the challenge:
 
 Run the challenge and print all the results of the multiplications:
 ```bash
-    ./main print=true
+    ./main print=1
 ```
 
 Run the challenge with a new_file.mtx
