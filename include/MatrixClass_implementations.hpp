@@ -370,6 +370,7 @@ namespace algebra{
     template<typename T, StorageOrder S>
     void MatrixClass<T,S>::print_matrix()const{
         for (std::size_t i = 0; i <_rows; ++i) {
+            std::cout<<"| ";
             for (std::size_t j = 0; j < _cols; ++j) {
                 if constexpr(is_complex<T>{}){
                     std::cout << std::real((*this)(i, j)) << " + " << std::imag((*this)(i, j)) << "i   ";
@@ -378,6 +379,7 @@ namespace algebra{
                 }
 
             }
+            std::cout<<"|";
             std::cout << std::endl;
         }
     }

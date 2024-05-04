@@ -34,58 +34,58 @@ int main(int argc, char **argv){
   std::vector<double> v_big(B_row.get_cols(),1);
   algebra::MatrixClass<double,algebra::StorageOrder::row_wise> v_big_m(B_row.get_cols(),1,1);
 
-  std::cout<<"\n\nUncompress: -------------------------------------------------------------------\n"<<std::endl;
+  std::cout<<"\n\nUncompress: -------------------------------------------------------------------\n";
 
-  std::cout<<"\nProducts: matrix * vector\n\n"<<std::endl;
+  std::cout<<"\n\nProducts: matrix * vector\n";
 
-  std::cout<<"\n B_row * v_big:\n\n"<<std::endl;
+  std::cout<<"\n B_row * v_big: ";
 
   auto delta_U_1=time_test(B_row,v_big,print);
 
-  std::cout<<"\n B_col * v_big:\n\n"<<std::endl;
+  std::cout<<"\n B_col * v_big: ";
 
   auto delta_U_2=time_test(B_col,v_big,print);
 
-  std::cout<<"\nProducts: matrix * matrix\n\n"<<std::endl;
+  std::cout<<"\n\nProducts: matrix * matrix\n";
 
-  std::cout<<"\n B_row * v_big_m:\n\n"<<std::endl;
+  std::cout<<"\n B_row * v_big_m: ";
 
   auto delta_U_3=time_test(B_row,v_big_m,print);
 
-  std::cout<<"\n B_col * v_big_m:\n\n"<<std::endl;
+  std::cout<<"\n B_col * v_big_m: ";
 
   auto delta_U_4=time_test(B_col,v_big_m,print);
 
-  std::cout<<"\n B_col * B_row:\n\n"<<std::endl;
+  std::cout<<"\n B_col * B_row: ";
 
   auto delta_U_5=time_test(B_col,B_row,print);
 
-  std::cout<<"\n\nCompress: -------------------------------------------------------------------\n"<<std::endl;
+  std::cout<<"\n\nCompress: -------------------------------------------------------------------\n";
 
   B_row.compress();
   B_col.compress();
 
-  std::cout<<"Products: matrix * vector\n\n"<<std::endl;
+  std::cout<<"\n\nProducts: matrix * vector\n";
 
-  std::cout<<"\n B_row * v_big:\n\n"<<std::endl;
+  std::cout<<"\n B_row * v_big: ";
 
   auto delta_C_1=time_test(B_row,v_big,print);
 
-  std::cout<<"\n B_col * v_big:\n\n"<<std::endl;
+  std::cout<<"\n B_col * v_big: ";
 
   auto delta_C_2=time_test(B_col,v_big,print);
 
-  std::cout<<"\nProducts: matrix * matrix\n\n"<<std::endl;
+  std::cout<<"\n\nProducts: matrix * matrix\n";
 
-  std::cout<<"\n B_row * v_big_m:\n\n"<<std::endl;
+  std::cout<<"\n B_row * v_big_m: ";
 
   auto delta_C_3=time_test(B_row,v_big_m,print);
 
-  std::cout<<"\n B_col * v_big_m:\n\n"<<std::endl;
+  std::cout<<"\n B_col * v_big_m: ";
 
   auto delta_C_4=time_test(B_col,v_big_m,print);
 
-  std::cout<<"\n B_col * B_row:\n\n"<<std::endl;
+  std::cout<<"\n B_col * B_row: ";
 
   auto delta_C_5=time_test(B_col,B_row,print);
 
@@ -108,6 +108,7 @@ int main(int argc, char **argv){
   std::cout<<"B_row * v_big_m: "<<(delta_U_3.count()-delta_C_3.count())*100./delta_U_3.count()<<"%\n"<<std::endl;
   std::cout<<"B_col * v_big_m: "<<(delta_U_4.count()-delta_C_4.count())*100./delta_U_4.count()<<"%\n"<<std::endl;
   std::cout<<"B_col * B_row: "<<(delta_U_5.count()-delta_C_5.count())*100./delta_U_5.count()<<"%\n"<<std::endl;
+  
   
   /*
 
@@ -235,7 +236,7 @@ int main(int argc, char **argv){
    std::cout<<"\nA_row_complex: \n"<<std::endl;
    A_row_complex.print_matrix();
     
-    */
+  */
 
 
 

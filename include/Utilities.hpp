@@ -9,16 +9,14 @@ namespace algebra{
     */
    template<typename T>
    void print_vector(std::vector<T> & v){
-    std::cout<<"\n[ ";
       for(std::size_t i=0;i<v.size();++i){
             if constexpr(is_complex<T>::value){
-                std::cout<<v[i].real()<<"+"<<v[i].imag()<<"i ";
+                std::cout<<"| "<<v[i].real()<<"+"<<v[i].imag()<<"i |"<<std::endl;
             }else{
-                std::cout<<v[i]<<" ";
+                std::cout<<"| "<<v[i]<<" |"<<std::endl;
             }
             
       }
-      std::cout<<"]\n";
    };
 
    
