@@ -15,7 +15,7 @@ In large scale computations it is often necessary to exploit sparsity to be able
   - **Matrix-Matrix Multiplication**: Perform matrix multiplication efficiently.
   - **Matrix-Vector Multiplication**: Compute matrix-vector products swiftly.
   - **Matrix Norms**: Calculate various matrix norms including infinity norm, one norm, and Frobenius norm.
-  - **Time Execution**: Measure the execution time of matrix operations for performance analysis.
+  - **Time Execution**: Measure the execution time of matrix operations for performance analysis, thanks to the `chrono` library.
 
 - **Complex Number Support**: Designed to seamlessly handle operations with `std::complex` types, ensuring compatibility with complex-valued matrices and vectors.
 
@@ -60,7 +60,7 @@ Content of [MatrixClass_Utilities.hpp](https://github.com/irene-fagnani/challeng
 
 Content of [Utilities.hpp](https://github.com/irene-fagnani/challenge2/blob/main/Utilities.hpp)
 + A function to print vectors
-+ Two functions to count the time of the multiplication. (overload)
++ Two functions to count the time of the multiplication, thanks to the `chrono` library. Thanks to the overloading, the porogram is capable to deal with different input types parameters (vectors or MatrixClass).
 
 Content of [main.cpp](https://github.com/irene-fagnani/challenge2/blob/main/main.cpp)
 + It contains the main function. The case with "lnsp_131.mtx" matrix is setted as default. For each case, uncompressed and compressed, a set of operations are done: matrix * vector, matrix * vector, with vector as an MatrixClass object, and matrix * matrix. Also, all 3 types of norms are computed. The part with the smallest matrix is ​​commented because I believe the decrease in multiplication time going from the uncompressed case to the compressed one is not notable. However, in this part I show also how the methods of the class works also with `std::complex` types.
