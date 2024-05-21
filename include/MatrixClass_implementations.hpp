@@ -219,6 +219,7 @@ namespace algebra{
         values.clear();
     }
 
+    // It fills the whole matrix with val!
     template<typename T, StorageOrder S>
     void MatrixClass<T,S>::resize_matrix(std::size_t rows, std::size_t cols, T val){
 

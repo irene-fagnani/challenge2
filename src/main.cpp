@@ -110,7 +110,7 @@ int main(int argc, char **argv){
   std::cout<<"B_col * B_row: "<<(delta_U_5.count()-delta_C_5.count())*100./delta_U_5.count()<<"%\n"<<std::endl;
   
   
-  /*
+  
 
     std::cout<<"SMALL MATRIX CASE: ---------------------------------------------------------\n"<<std::endl;
     
@@ -136,6 +136,10 @@ int main(int argc, char **argv){
     std::cout<<"frobenius_norm: "<< A_row_complex.compute_norm<algebra::NormMethod::Frobenius_norm>()<<std::endl;
     
     std::cout<<"\nA_col: real matrix stored column_wise\n"<<std::endl;
+    A_col_real.print_matrix();
+    
+    A_col_real.resize_matrix(2,2,0);
+    std::cout << "\n A_col resized" << std::endl;
     A_col_real.print_matrix();
 
     std::cout<<"\nNorm computations\n "<<std::endl;
@@ -236,7 +240,7 @@ int main(int argc, char **argv){
    std::cout<<"\nA_row_complex: \n"<<std::endl;
    A_row_complex.print_matrix();
     
-  */
+  
 
 
 

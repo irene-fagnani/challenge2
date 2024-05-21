@@ -1,0 +1,13 @@
+- clear and complete documentation and comments in the code
+
+- you should print warnings in functions that only work if the matrix is not compressed
+- you could have implemented the operator* as a friend function, as suggested
+
+- the resize_matrix method does not behave as expected.
+    It replaces all the elements inside a matrix with the given value and does not modify the number of rows/columns.
+- in the constructor you give the possibility to fill the whole matrix with a value T.
+    Not very useful because we are dealing with sparse matrices.
+
+- avoid commenting a huge part of the code used for testing.
+    Put it in a separate source file in a test foalder, instead.
+
